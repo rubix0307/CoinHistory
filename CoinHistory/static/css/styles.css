@@ -1,0 +1,30 @@
+
+body {
+    padding: 0;
+    margin: 0;
+}
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+    margin-bottom: 20px;
+    height: 50px;
+    width: 100%;
+    border-bottom: 1px #000000 solid;
+
+    .auth{
+        padding: 0 10px;
+    }
+    .auth a {
+        text-decoration: none;
+        padding: 5px 10px;
+        border-radius: 10px;
+        border: 1px transparent solid;
+    }
+    .auth a:hover {
+        border: 1px #000000 solid;
+    }
+}
+
+
