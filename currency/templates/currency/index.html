@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Currency dashboard{% endblock %}
+
+{% block content %}
+    <h2>Currency dashboard</h2>
+    <div class="currency-dashboard-place">
+        <table class="currency-dashboard">
+            <thead>
+                <tr>
+                    <th class="left">#</th>
+                    <th class="left">Name</th>
+                    <th>Price</th>
+                    <th>1h</th>
+                    <th>24h</th>
+                    <th>Fully Diluted Market Cap</th>
+                    <th>Volume</th>
+                    <th>Blockchain</th>
+                    <th>Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="left">1</th>
+                    <th class="left">KINGBONK</th>
+                    <th>$0.000000000001262</th>
+                    <th>50.41%</th>
+                    <th>24.29%</th>
+                    <th>$529,964</th>
+                    <th>$981,231</th>
+                    <th>BNB</th>
+                    <th>6 hours ago</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
