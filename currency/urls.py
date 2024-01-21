@@ -3,5 +3,5 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='currency_index'),
+    path('', views.temp_func, name='currency_index'),
 ]
