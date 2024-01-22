@@ -39,14 +39,23 @@ header {
     max-width: max-content;
     font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
 
+
+    .logo {
+        border-radius: 100%;
+        max-width: 30px;
+        align-items: center;
+        margin: 0 10px 0 0;
+    }
     .currency-dashboard {
         border-collapse: separate;
         border-spacing: 0;
 
     }
+
     .currency-dashboard tbody tr th,
     .currency-dashboard tbody tr th.left{
        border-right: 1px transparent solid;
+
     }
     .currency-dashboard tbody tr:hover,
     .currency-dashboard tbody tr:hover th.left{
@@ -63,6 +72,16 @@ header {
         border-bottom: 1px #0000003d solid;
         text-decoration: none;
         font-weight:normal;
+        .caption {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            .symbol {
+                padding: 0 5px;
+                color: gray;
+            }
+        }
     }
     .currency-dashboard tbody tr:last-child th {
         border-bottom: 1px transparent solid;
