@@ -102,7 +102,7 @@ def get_market_pairs(*, slug: str, start:int = 1, limit:int = 10, x_request_id:s
         response.raise_for_status()
         data = json.loads(response.text)
 
-        return [MarketPair(**pair) for pair in data.get('data',{}).get('marketPairs', {}) if not pair.get('derivativeTickerId')]
+        return [MarketPair(**pair) for pair in data.get('data',{}).get('marketPairs', {}) if pair.get('isVerified')]
 
     except HTTPError as ex:
         return []
