@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}{{ currency.market_pair }}{% endblock %}
+
+{% block content %}
+    <h1>{{ currency.name }}</h1>
+    <div class="markets">
+        <h2>{{ currency.name }} Markets</h2>
+
+
+        <div class="currency-dashboard-place">
+        <table class="currency-dashboard">
+            <thead>
+                <tr>
+                    <th class="left">#</th>
+                    <th class="left">Exchange</th>
+                    <th class="left">Pair</th>
+                    <th class="left">Price</th>
+                    <th class="left">Last updated</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for pair in markets %}
+
+                        <tr>
+                            <th class="left">{{ forloop.counter }}</th>
+                            <th class="left">{{ pair.exchange_name }}</th>
+                            <th><a href="{{ pair.dexer_url }}">{{ pair.market_pair }}</a></th>
+                            <th>{{ pair.price }}</th>
+                            <th>{{ pair.last_updated }}</th>
+                        </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

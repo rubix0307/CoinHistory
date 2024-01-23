@@ -16,13 +16,14 @@
             </thead>
             <tbody>
                 {% for currency in currencies %}
-                    <tr>
-                        <th class="left">{{ forloop.counter }}</th>
-                        <th class="left"><div class="caption">{% if currency.logo %}<img class="logo" alt="Logo for {{ currency.name }}" src="{{ currency.logo }}">{% endif %}{{ currency.name }} <div class="symbol">{{ currency.symbol }}</div></div></th>
-                        <th>{{ currency.platform }}</th>
-                        <th>{{ currency.last_updated }}</th>
-                        <th>{{ currency.date_added }}</th>
-                    </tr>
+
+                        <tr>
+                            <th class="left">{{ forloop.counter }}</th>
+                            <th class="left"><a href="{% url 'currency_detail' slug=currency.slug %}" class="caption">{% if currency.logo %}<img class="logo" alt="Logo for {{ currency.name }}" src="{{ currency.logo }}">{% endif %}{{ currency.name }} <div class="symbol">{{ currency.symbol }}</div></a></th>
+                            <th>{{ currency.platform }}</th>
+                            <th>{{ currency.last_updated }}</th>
+                            <th>{{ currency.date_added }}</th>
+                        </tr>
                 {% endfor %}
             </tbody>
         </table>

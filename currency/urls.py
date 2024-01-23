@@ -3,5 +3,6 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('', views.temp_func, name='currency_index'),
+    path('', views.index, name='currency_index'),
+    path('<str:slug>', views.currency_detail, name='currency_detail'),
 ]

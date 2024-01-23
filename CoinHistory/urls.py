@@ -21,7 +21,7 @@ from user import views as users_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('django.contrib.auth.urls')),
-    path('currency/', include('currency.urls')),
+    path('currencies/', include('currency.urls')),
 
     path('profile/', users_views.profile, name='profile'),
 ]
