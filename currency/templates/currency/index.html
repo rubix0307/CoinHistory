@@ -10,6 +10,7 @@
                     <th class="left">#</th>
                     <th class="left">Name</th>
                     <th>Blockchain</th>
+                    <th>Last updated</th>
                     <th>Added</th>
                 </tr>
             </thead>
@@ -19,6 +20,7 @@
                         <th class="left">{{ forloop.counter }}</th>
                         <th class="left"><div class="caption">{% if currency.logo %}<img class="logo" alt="Logo for {{ currency.name }}" src="{{ currency.logo }}">{% endif %}{{ currency.name }} <div class="symbol">{{ currency.symbol }}</div></div></th>
                         <th>{{ currency.platform }}</th>
+                        <th>{{ currency.last_updated }}</th>
                         <th>{{ currency.date_added }}</th>
                     </tr>
                 {% endfor %}

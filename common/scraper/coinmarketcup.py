@@ -24,7 +24,10 @@ def convert_to_datetime(time_string):
 
     offset = dict(zip([matched.group(2)], [int(matched.group(1))]))
 
-    if matched.group(2) in ['minutes', 'hours', 'days']:
+    if matched.group(2) in ['minutes', 'hours', 'day', 'days']:
+        if matched.group(2) == 'day':
+            offset['days'] = offset.pop('day')
+
         return current_time - timedelta(**offset)
     return None
 
@@ -54,8 +57,10 @@ class CMCScraper:
         else:
             self.headers = headers
 
-    def get_listings_new(self) -> list[Currency] | list:
+    def get_listings_new(self, check_only_new=False) -> list[Currency] | list:
         listings_new = []
+        listings_exists = []
+        all_slugs = Currency.objects.all().values_list('slug', flat=True)
 
         url = 'https://coinmarketcap.com/new/'
         response = requests.get(url=url, headers=self.headers)
@@ -63,21 +68,31 @@ class CMCScraper:
         try:
             response.raise_for_status()
         except HTTPError as ex:
-            return
+            return []
 
         soup = BeautifulSoup(response.text, 'html.parser')
         rows = soup.find('tbody').find_all('tr')
 
         for row in rows:
-            row_tds = row.find_all('td')
 
+            row_tds = row.find_all('td')
             slug = row_tds[2].find('a').attrs.get('href').split('/')[2]
+
+            if check_only_new and slug in all_slugs:
+                break
+
             new_currency = Currency(
                 slug=slug,
                 coinmarketcap_url=f'https://coinmarketcap.com/currencies/{slug}',
                 platform=row_tds[8].text,
-                date_added=convert_to_datetime(row_tds[9].text),
             )
+
+            if slug in all_slugs:
+                new_currency.last_updated=timezone.now()
+                listings_exists.append(new_currency)
+            else:
+                new_currency.date_added=convert_to_datetime(row_tds[9].text)
+                listings_new.append(new_currency)
 
             # search info in currency page
             response_currency_page = requests.get(url=new_currency.coinmarketcap_url, headers=self.headers)
@@ -91,11 +106,12 @@ class CMCScraper:
             new_currency.description = soup_currency_page.find('div', id='section-coin-about').contents[1].text
             new_currency.symbol = caption.find('span', attrs={'data-role': 'coin-symbol'}).text
             new_currency.logo = caption.find('div', attrs={'data-role': 'coin-logo'}).contents[0].attrs.get('src')
-            new_currency.save()
 
-            listings_new.append(new_currency)
-        return listings_new
+        Currency.objects.bulk_create(listings_new)
+        Currency.objects.bulk_update(listings_exists,  ['name', 'slug', 'description', 'symbol', 'logo', 'coinmarketcap_url', 'platform', 'last_updated'])
+
+        return listings_new + listings_exists
 
 
 sc = CMCScraper()
-sc.get_listings_new()
+sc.get_listings_new(check_only_new=True)
