@@ -1,63 +1,23 @@
 import json
 import os
+import re
 from typing import Union
-from dataclasses import dataclass
 
+import django
 import requests
 from requests.exceptions import HTTPError
 from dotenv import load_dotenv
 
+
 load_dotenv('.env')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CoinHistory.settings')
+django.setup()
+
+from common.edit_text import camel_to_snake
+from currency.models import Pair, Currency
 
 
-@dataclass
-class MarketPair:
-    baseCurrencyId: int
-    baseSymbol: str
-    category: str
-    centerType: str
-    depthUsdNegativeTwo: float
-    depthUsdPositiveTwo: float
-    effectiveLiquidity: float
-    exchangeId: int
-    exchangeName: str
-    exchangeNotice: str
-    exchangeSlug: str
-    feeType: str
-    indexPrice: int
-    isVerified: int
-    lastUpdated: str
-    marketId: int
-    marketPair: str
-    marketReputation: int
-    marketScore: str
-    marketUrl: str
-    outlierDetected: int
-    porAuditStatus: int
-    price: float
-    priceExcluded: int
-    quote: float
-    quoteCurrencyId: int
-    quotes: list
-    quoteSymbol: str
-    rank: int
-    reservesAvailable: int
-    type: str
-    volumeBase: float
-    volumeExcluded: int
-    volumePercent: float
-    volumeQuote: float
-    volumeUsd: float
-    platformId: int = None
-    platformName: str = None
-    pairContractAddress: str = None
-    liquidity: float = None
-    dexerUrl: str = None
-
-    def __str__(self):
-        return f'{self.exchangeName} - {self.marketPair}'
-
-def get_market_pairs(*, slug: str, start:int = 1, limit:int = 10, x_request_id:str = os.getenv('X_REQUEST_ID')) ->  Union[list[MarketPair], list]:
+def get_market_pairs(*, slug: str, start:int = 1, limit:int = 10, x_request_id:str = os.getenv('X_REQUEST_ID')) ->  Union[list[Pair], list]:
     """
     :param slug: cryptocurrency slug. Ex: bitcoin
     :param start: Show pairs starting from the specified number
@@ -102,8 +62,7 @@ def get_market_pairs(*, slug: str, start:int = 1, limit:int = 10, x_request_id:s
         response.raise_for_status()
         data = json.loads(response.text)
 
-        return [MarketPair(**pair) for pair in data.get('data',{}).get('marketPairs', {}) if pair.get('isVerified')]
+        return [Pair(**{camel_to_snake(k): v for k, v in pair.items() if not k == 'quotes'}) for pair in data.get('data',{}).get('marketPairs', {}) if pair.get('isVerified')]
 
     except HTTPError as ex:
         return []
-
