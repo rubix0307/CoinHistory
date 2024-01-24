@@ -13,7 +13,6 @@ class Pair(models.Model):
     center_type = models.CharField(max_length=255)
     depth_usd_negative_two = models.DecimalField(max_digits=25, decimal_places=15)
     depth_usd_positive_two = models.DecimalField(max_digits=25, decimal_places=15)
-    effective_liquidity = models.DecimalField(max_digits=25, decimal_places=15)
     exchange_id = models.IntegerField()
     exchange_name = models.CharField(max_length=255)
     exchange_notice = models.CharField(max_length=255)
@@ -38,6 +37,7 @@ class Pair(models.Model):
     volume_quote = models.DecimalField(max_digits=25, decimal_places=15)
     volume_usd = models.DecimalField(max_digits=25, decimal_places=15)
 
+    effective_liquidity = models.DecimalField(max_digits=25, decimal_places=15, null=True)
     platform_id = models.IntegerField(null=True)
     platform_name = models.CharField(null=True, max_length=255)
     pair_contract_address = models.CharField(null=True, max_length=255)
