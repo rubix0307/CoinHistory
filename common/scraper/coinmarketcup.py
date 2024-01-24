@@ -1,18 +1,20 @@
-import os
 import re
+import os
+import json
 from datetime import timedelta
 
 import django
-from django.utils import timezone
 import requests
-from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
+from django.utils import timezone
+from requests.exceptions import HTTPError
+
+from common.edit_text import camel_to_snake
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CoinHistory.settings')
 django.setup()
 
-from currency.models import Currency
-
+from currency.models import Currency, Pair
 
 
 def convert_to_datetime(time_string):
@@ -34,7 +36,7 @@ def convert_to_datetime(time_string):
 
 class CMCScraper:
 
-    def __init__(self, headers=None):
+    def __init__(self, headers=None, x_request_id: str = os.getenv('X_REQUEST_ID')):
 
         if not headers:
             self.headers = {
@@ -52,7 +54,8 @@ class CMCScraper:
                 "Sec-Fetch-Site": "same-origin",
                 "Sec-Fetch-User": "?1",
                 "Upgrade-Insecure-Requests": "1",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "X-Request-Id": x_request_id,
             }
         else:
             self.headers = headers
@@ -112,6 +115,56 @@ class CMCScraper:
 
         return listings_new + listings_exists
 
+    def get_market_pairs(self, *, obj: str | Currency, start: int = 1, limit: int = 10) -> list[Pair] | list:
+        """
+        :param obj: cryptocurrency slug. Ex: bitcoin | Currency.objects.first()
+        :param start: Show pairs starting from the specified number
+        :param limit: max pairs count
+        :return: list[MarketPair] | []
+        """
 
-sc = CMCScraper()
-sc.get_listings_new(check_only_new=True)
+        if type(obj) == Currency:
+            slug = obj.slug
+            save_pairs = True
+        else:
+            slug = obj
+            save_pairs = False
+
+
+        url = "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/market-pairs/latest"
+
+        params = {
+            'slug': slug,
+            'start': start,
+            'limit': limit,
+            'category': 'spot',
+            'centerType': 'all',
+            'sort': 'rank',
+            'direction': 'desc',
+            'spotUntracked': 'true',
+        }
+
+        try:
+            response = requests.get(url, headers=self.headers, params=params)
+            response.raise_for_status()
+            data = json.loads(response.text)
+
+            pairs = [Pair(**{camel_to_snake(k): v for k, v in pair.items() if not k == 'quotes'}) for pair in
+                    data.get('data', {}).get('marketPairs', {}) if pair.get('isVerified')]
+
+            if save_pairs:
+                Pair.objects.bulk_create(pairs, ignore_conflicts=True)
+                Pair.objects.bulk_update(pairs, fields=['exchange_name', 'dexer_url', 'market_pair', 'price', 'volume_usd', 'volume_percent', 'effective_liquidity', 'last_updated'])
+                obj.pairs.set(pairs)
+
+            return pairs
+
+        except HTTPError as ex:
+            return []
+
+# sc = CMCScraper()
+# sc.get_listings_new()
+# currencies = Currency.objects.all()
+# for i in currencies:
+#   sc.get_market_pairs(obj=i, limit=100)
+# print()
