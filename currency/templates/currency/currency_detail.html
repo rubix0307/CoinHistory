@@ -1,44 +1,11 @@
 {% extends 'base.html' %}
-{% load mathfilters %}
 {% block title %}{{ currency.market_pair }}{% endblock %}
 
 {% block content %}
-    <h1>{{ currency.name }}</h1>
+    <h1><a href="{{ currency.coinmarketcap_url }}">{{ currency.name }}</a></h1>
+    {% include 'currency/inc/_tags.html' %}
+
     <div class="markets">
-        <h2>{{ currency.name }} Markets</h2>
-
-
-        <div class="currency-dashboard-place">
-        <table class="currency-dashboard">
-            <thead>
-                <tr>
-                    <th class="left">#</th>
-                    <th class="left">Exchange</th>
-                    <th class="left">Pair</th>
-                    <th class="left">Price</th>
-                    <th class="left">Volume (24h)</th>
-                    <th class="left">Volume %</th>
-                    <th class="left">Liquidity Score</th>
-                    <th class="left">Last updated</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                {% for pair in markets %}
-                    <tr>
-                        <th class="left">{{ forloop.counter }}</th>
-                        <th class="left">{{ pair.exchange_name }}</th>
-                        <th>{% if pair.dexer_url %}<a href="{{ pair.dexer_url }}" target="_blank">{% endif %} {{ pair.market_pair }}{% if pair.dexer_url %}</a>{% endif %}</th>
-                        <th>{{ pair.price }}</th>
-                        <th>{{ pair.volume_usd|div:1000|floatformat:3 }}</th>
-                        <th>{{ pair.volume_percent|floatformat:2 }}</th>
-                        <th>{{ pair.effective_liquidity|floatformat:0 }}</th>
-                        <th>{{ pair.last_updated }}</th>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        </div>
+        {% include 'currency/inc/_markets.html' %}
     </div>
-
 {% endblock %}

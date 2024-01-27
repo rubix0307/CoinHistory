@@ -47,10 +47,12 @@ class Pair(models.Model):
     def __str__(self):
         return f'{self.exchange_name} - {self.market_pair}'
 
+    class Meta:
+        ordering = ['-volume_percent']
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
-    slug = models.CharField(max_length=255)
+    href = models.CharField(max_length=255)
 
 class Currency(models.Model):
     id = models.PositiveIntegerField(primary_key=True)

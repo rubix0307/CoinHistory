@@ -126,3 +126,16 @@ form.auth input[type="submit"]{
     width: 100%;
     padding: 5px;
 }
+
+
+.tags {
+    width: max-content;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.tags ul {
+    padding: 0 0 0 25px;
+    margin: 0;
+}

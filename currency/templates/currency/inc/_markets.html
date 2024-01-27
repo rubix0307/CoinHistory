@@ -1,0 +1,34 @@
+{% load mathfilters %}
+<div class="market">
+    <h2>{{ currency.name }} Markets</h2>
+    <div class="currency-dashboard-place">
+        <table class="currency-dashboard">
+            <thead>
+                <tr>
+                    <th class="left">#</th>
+                    <th class="left">Exchange</th>
+                    <th class="left">Pair</th>
+                    <th class="left">Price</th>
+                    <th class="left">Volume (24h)</th>
+                    <th class="left">Volume %</th>
+                    <th class="left">Liquidity Score</th>
+                    <th class="left">Last updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pair in currency.pairs.all %}
+                    <tr>
+                        <th class="left">{{ forloop.counter }}</th>
+                        <th class="left">{{ pair.exchange_name }}</th>
+                        <th>{% if pair.dexer_url %}<a href="{{ pair.dexer_url }}" target="_blank">{% endif %} {{ pair.market_pair }}{% if pair.dexer_url %}</a>{% endif %}</th>
+                        <th>{{ pair.price }}</th>
+                        <th>{{ pair.volume_usd|div:1000|floatformat:3 }}</th>
+                        <th>{{ pair.volume_percent|floatformat:2 }}</th>
+                        <th>{{ pair.effective_liquidity|floatformat:0 }}</th>
+                        <th>{{ pair.last_updated }}</th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -13,9 +13,8 @@ def index(request: WSGIRequest):
     return render(request, 'currency/index.html', context=context)
 
 def currency_detail(request, slug: str):
-    currency = Currency.objects.filter(slug=slug).select_related().first()
+    currency = Currency.objects.filter(slug=slug).prefetch_related('tags', 'pairs').first()
     context = {
         'currency': currency,
-        'markets': currency.pairs.all(),
     }
     return render(request, 'currency/currency_detail.html', context=context)

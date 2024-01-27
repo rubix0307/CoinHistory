@@ -14,7 +14,7 @@ from common.edit_text import camel_to_snake
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CoinHistory.settings')
 django.setup()
 
-from currency.models import Currency, Pair
+from currency.models import Currency, Pair, Tag
 
 
 def convert_to_datetime(time_string):
@@ -65,6 +65,9 @@ class CMCScraper:
         listings_exists = []
         all_slugs = Currency.objects.all().values_list('slug', flat=True)
 
+        all_tags = {t.name: t for t in Tag.objects.all()}
+        currency_tags = []
+
         url = 'https://coinmarketcap.com/new/'
         response = requests.get(url=url, headers=self.headers)
 
@@ -83,6 +86,8 @@ class CMCScraper:
 
             if check_only_new and slug in all_slugs:
                 break
+            if slug == 'kingwif':
+                print()
 
             new_currency = Currency(
                 slug=slug,
@@ -104,6 +109,24 @@ class CMCScraper:
             stats = soup_currency_page.find('div', attrs={'data-module-name': "Coin-stats"})
             caption = stats.find('div', attrs={'data-role': 'el'})
 
+            # add tags
+            exists_tags = []
+            new_tags = []
+            for a in [a for a in stats.find_all('a', attrs={'class': 'cmc-link'}) if a.attrs['class'] == ['cmc-link']]:
+                if a.text in all_tags.keys():
+                    exists_tags.append(all_tags[a.text])
+                else:
+                    new_tags.append(Tag(name=a.text, href=a.attrs.get('href')))
+
+            for t in new_tags:
+                t.save()
+            all_tags.update({t.name: t for t in new_tags})
+
+            tags = exists_tags + new_tags
+            if tags:
+                currency_tags.append([new_currency, tags])
+
+            # set main data
             new_currency.id = int(soup_currency_page.find('div', attrs={'data-role': 'chip-content-item'}).text)
             new_currency.name = caption.find('span', attrs={'data-role': 'coin-name'}).attrs.get('title')
             new_currency.description = soup_currency_page.find('div', id='section-coin-about').contents[1].text
@@ -112,6 +135,13 @@ class CMCScraper:
 
         Currency.objects.bulk_create(listings_new)
         Currency.objects.bulk_update(listings_exists,  ['name', 'slug', 'description', 'symbol', 'logo', 'coinmarketcap_url', 'platform', 'last_updated'])
+
+        for currency, tags_list in currency_tags:
+
+            currency = currency._meta.model.objects.using('default').get(pk=currency.pk)
+            tags_to_set = [tag._meta.model.objects.using('default').get(pk=tag.pk) for tag in tags_list]
+            currency.tags.set(tags_to_set)
+
 
         return listings_new + listings_exists
 

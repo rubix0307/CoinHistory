@@ -1,0 +1,11 @@
+{% if currency.tags.all %}
+    <div class="tags">
+        <h3>Tags</h3>
+        <ul>
+            {% for tag in currency.tags.all %}
+                <li>{{ tag.name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
