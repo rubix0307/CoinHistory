@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Login{% endblock %}
+{% block title %}{{ title|default:"Login" }}{% endblock %}
 
 {% block content %}
-    <h2>Login</h2>
-    <form method="post">
+    <h2>{{ title|default:"Login" }}</h2>
+    <form method="post" class="auth">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Submit">
