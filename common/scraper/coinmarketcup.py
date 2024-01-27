@@ -156,15 +156,10 @@ class CMCScraper:
                 Pair.objects.bulk_create(pairs, ignore_conflicts=True)
                 Pair.objects.bulk_update(pairs, fields=['exchange_name', 'dexer_url', 'market_pair', 'price', 'volume_usd', 'volume_percent', 'effective_liquidity', 'last_updated'])
                 obj.pairs.set(pairs)
+                obj.last_updated = timezone.now()
+                obj.save()
 
             return pairs
 
         except HTTPError as ex:
             return []
-
-# sc = CMCScraper()
-# sc.get_listings_new()
-# currencies = Currency.objects.all()
-# for i in currencies:
-#   sc.get_market_pairs(obj=i, limit=100)
-# print()
