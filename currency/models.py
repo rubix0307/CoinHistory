@@ -69,6 +69,12 @@ class Currency(models.Model):
     last_updated = models.DateTimeField(default=timezone.now)
     date_added = models.DateTimeField(default=timezone.now)
 
+    def __str__(self):
+        return f'<{self.__class__.__name__}>: {self.name} ({self.id})'
+
+    def __repr__(self):
+        return self.__str__()
+
     class Meta:
         db_table = 'currency'
 
