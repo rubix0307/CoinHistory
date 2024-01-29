@@ -1,3 +1,4 @@
+import time
 from django.db import models
 from django.utils import timezone
 
@@ -53,6 +54,12 @@ class Pair(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=255)
     href = models.CharField(max_length=255)
+
+class Value(models.Model):
+    currency = models.ForeignKey('Currency', on_delete=models.CASCADE)
+    time = models.IntegerField()
+    price = models.BigIntegerField()
+
 
 class Currency(models.Model):
     id = models.PositiveIntegerField(primary_key=True)

@@ -1,0 +1,47 @@
+{% load static %}
+<div class="chart">
+  {#<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>#}
+    <script src="{% static 'js\lightweight.js' %}"></script>
+
+    <style>
+        #candlestickChart {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+    </style>
+
+
+    <div id="candlestickChart"></div>
+
+    <script>
+        // Создаем график
+        const chart = LightweightCharts.createChart(document.getElementById('candlestickChart'), {
+            height: 300,
+            timeScale: {
+                timeVisible: true,
+            },
+        });
+        const candleSeries = chart.addCandlestickSeries({
+            upColor: "#16C784",
+            downColor: "#EA3943",
+            borderDownColor: "#EA3943",
+            borderUpColor: "#16C784",
+            wickDownColor: "#EA3943",
+            wickUpColor: "#16C784",
+        });
+        const data = [
+           {% for d in chart_data %}{ time: {{ d.start_time }}, open: {{ d.open_price }}, high: {{ d.high_price }}, low: {{ d.low_price }}, close: {{ d.close_price }} },
+           {% endfor %}
+        ];
+        candleSeries.setData(data);
+        chart.timeScale().applyOptions({
+            borderColor: 'transparent',
+            rightOffset: 1,
+            barSpacing: 15,
+            minBarSpacing: 50,
+            timeVisible: true,
+        });
+        {#chart.timeScale().fitContent();#}
+
+    </script>
+</div>
