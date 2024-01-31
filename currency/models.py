@@ -57,8 +57,8 @@ class Tag(models.Model):
 
 class Value(models.Model):
     currency = models.ForeignKey('Currency', on_delete=models.CASCADE)
-    time = models.IntegerField()
-    price = models.BigIntegerField()
+    time = models.BigIntegerField()
+    price = models.DecimalField(max_digits=30, decimal_places=20)
 
 
 class Currency(models.Model):
