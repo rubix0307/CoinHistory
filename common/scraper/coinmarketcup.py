@@ -2,6 +2,7 @@ import re
 import os
 import json
 from datetime import timedelta
+from dataclasses import dataclass
 
 import django
 import requests
@@ -14,7 +15,24 @@ from common.edit_text import camel_to_snake
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CoinHistory.settings')
 django.setup()
 
-from currency.models import Currency, Pair, Tag
+from currency.models import Currency, Pair, Tag, Value
+
+class ChartRange:
+    day = '1D'
+    week = '7D'
+    month = '1M'
+    year = '1Y'
+    all = 'ALL'
+
+@dataclass
+class ChartData:
+    currency: Currency
+    time: int
+    price: float
+
+    def dict(self):
+        # for objects.update_or_create
+        return {'currency': self.currency, 'time': self.time, 'defaults': {'price': self.price}}
 
 
 def convert_to_datetime(time_string):
@@ -193,3 +211,21 @@ class CMCScraper:
 
         except HTTPError as ex:
             return []
+
+    def get_chart_data(self, currency: Currency, chart_range: ChartRange=ChartRange.all, is_save=True) -> list[ChartData]:
+        # TODO exceptions
+        url = 'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail/chart'
+        params = {
+            'id': currency.id,
+            'range': chart_range,
+        }
+        response = requests.get(url, headers=self.headers, params=params)
+        data = json.loads(response.text)
+
+        chart_data = [ChartData(currency=currency, time=int(i), price=data['data']['points'][i]['v'][0]) for i in data['data']['points']]
+
+        if is_save:
+            for cd in chart_data:
+                Value.objects.update_or_create(**cd.dict())
+        return chart_data
+
