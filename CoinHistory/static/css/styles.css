@@ -144,6 +144,8 @@ form.auth input[type="submit"]{
     border-radius: 14px;
     border: 2px #f1f1f1 solid;
     padding: 6px;
+    max-width: 980px;
+    margin: 0 auto;
 
     .header {
         display: flex;
@@ -176,3 +178,4 @@ form.auth input[type="submit"]{
         }
     }
 }
+

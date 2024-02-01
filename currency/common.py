@@ -17,9 +17,9 @@ class CandleData:
         type_hints = get_type_hints(CandleData)
         return {k: type_hints[k](v) for k, v in asdict(self).items() if v}
 
-def get_chart_data(*, time_period: int, currency_id: int) -> list[CandleData]:
+def get_candles_chart_data(*, time_period: int, currency_id: int) -> list[CandleData]:
     """
-    :param time_period: int Value of period for candlestick assembly (in seconds)
+    :param time_period: int Value of period for candles assembly (in seconds)
     :param currency_id: id models.Currency
     :return: list[CandleData]
     """
@@ -30,7 +30,7 @@ def get_chart_data(*, time_period: int, currency_id: int) -> list[CandleData]:
         WITH RECURSIVE TimeSeries (time) AS (
             SELECT (SELECT MIN(time) FROM {db_table} WHERE currency_id = {currency_id}) -- start
             UNION ALL
-            SELECT time + 1 -- step
+            SELECT time + {time_period} -- step
             FROM TimeSeries
             WHERE time < (SELECT MAX(time) FROM {db_table} WHERE currency_id = {currency_id})  -- end
         )

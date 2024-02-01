@@ -1,89 +1,34 @@
 {% load static %}
 {% load mathfilters %}
 <div class="chart">
-  {#<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>#}
-    <script src="{% static 'js\lightweight.js' %}"></script>
-
-    <style>
-        #candlestickChart {
-            max-width: 980px;
-            margin: 0 auto;
-        }
-    </style>
-
 
     <div id="candlestickChart">
         <div class="header">
             <div class="periods">
-                {% with time_period=request.GET.time_period|default:'900' %}
+                {% with time_period=time_period|default:'900'|stringformat:"s" %}
                     <a {% if time_period == '60' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=60">1m</a>
                     <a {% if time_period == '300' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=300">5m</a>
                     <a {% if time_period == '900' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=900">15m</a>
                     <a {% if time_period == '1800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=1800">30m</a>
-                    <a {% if time_period == '3600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=3600">1H</a>
-                    <a {% if time_period == '86400' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=86400">1D</a>
+                    <a {% if time_period == '3600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=3600">1h</a>
+                    <a {% if time_period == '86400' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=86400">1d</a>
                 {% endwith %}
             </div>
         </div>
     </div>
 
+    <script src="{% static 'js\lightweight.js' %}"></script>
+    <script src="{% static 'js\chart.js' %}"></script>
     <script>
-        // Создаем график
-        const chart = LightweightCharts.createChart(document.getElementById('candlestickChart'), {
-            height: 300,
-            timeScale: {
-                timeVisible: true,
-            },
-            rightPriceScale: {
-                scaleMargins: {
-                    top: 0.1,
-                    bottom: 0.1,
-                },
-                borderVisible: false,
-            },
-            layout: {
-                backgroundColor: '#ffffff',
-                textColor: '#333',
-            },
-            grid: {
-                vertLines: {
-                    color: '#ebebeb',
-                },
-                horzLines: {
-                    color: '#f0f3fa',
-                },
-            },
-            localization: {
-                priceFormatter: price => parseFloat(price).toFixed(4),
-            },
-        });
-        const candleSeries = chart.addCandlestickSeries({
-            upColor: "#16C784",
-            downColor: "#EA3943",
-            borderDownColor: "#EA3943",
-            borderUpColor: "#16C784",
-            wickDownColor: "#EA3943",
-            wickUpColor: "#16C784",
-        });
+        // TODO get date on request
         const data = [
             {% autoescape off %}
                {% for d in chart_data %}{{ d.dict }},
                {% endfor %}
             {% endautoescape %}
         ];
-
-        for (let i = 0; i < data.length; i++) {
-            candleSeries.update(data[i]);
-        }
-
-        chart.timeScale().applyOptions({
-            borderColor: 'transparent',
-            rightOffset: 1,
-            barSpacing: 15,
-            minBarSpacing: 10,
-            timeVisible: true,
-        });
-        {#chart.timeScale().fitContent();#}
-
+        // TODO set dynamic fractionDigits
+        candleChart("candlestickChart", data)
     </script>
+
 </div>
