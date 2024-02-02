@@ -11,6 +11,7 @@ class CandleData:
     high: float = None
     low: float = None
     close: float = None
+    value: float = None
 
     def dict(self):
         # Only to easily create const data in _chart.html in the JS part
@@ -41,7 +42,8 @@ def get_candles_chart_data(*, time_period: int, currency_id: int) -> list[Candle
               SUBSTRING_INDEX(MIN(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS open,
               MAX(price) AS high,
               MIN(price) AS low,
-              SUBSTRING_INDEX(MAX(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS close 
+              SUBSTRING_INDEX(MAX(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS close,
+              SUBSTRING_INDEX(MAX(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS value
         FROM (SELECT *, FLOOR(time/{time_period}) AS n FROM {db_table} WHERE currency_id = {currency_id}
               UNION
               SELECT *, FLOOR(time/{time_period})-1 AS n FROM {db_table} WHERE currency_id = {currency_id} AND !(time%{time_period})

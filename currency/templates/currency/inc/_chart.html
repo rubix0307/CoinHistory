@@ -7,11 +7,17 @@
             <div class="periods">
                 {% with time_period=time_period|default:'900'|stringformat:"s" %}
                     <a {% if time_period == '60' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=60">1m</a>
+                    <a {% if time_period == '180' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=180">3m</a>
                     <a {% if time_period == '300' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=300">5m</a>
                     <a {% if time_period == '900' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=900">15m</a>
                     <a {% if time_period == '1800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=1800">30m</a>
-                    <a {% if time_period == '3600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=3600">1h</a>
-                    <a {% if time_period == '86400' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=86400">1d</a>
+                    <a {% if time_period == '3600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=3600">1H</a>
+                    <a {% if time_period == '86400' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=86400">1D</a>
+
+                    <div class="items">
+                        <div id="line-toggle" class="item active">Line</div>
+                        <div id="candlestick-toggle" class="item active">Candlestick</div>
+                    </div>
                 {% endwith %}
             </div>
         </div>
@@ -21,14 +27,15 @@
     <script src="{% static 'js/chart.js' %}"></script>
     <script>
         // TODO get date on request
-        const data = [
+        let data = [
             {% autoescape off %}
                {% for d in chart_data %}{{ d.dict }},
                {% endfor %}
             {% endautoescape %}
         ];
         // TODO set dynamic fractionDigits
-        candleChart("candlestickChart", data)
-    </script>
+        candlestickChart("candlestickChart", data)
+
+  </script>
 
 </div>
