@@ -18,11 +18,11 @@ django.setup()
 from currency.models import Currency, Pair, Tag, Value
 
 class ChartRange:
-    day = '1D'
-    week = '7D'
-    month = '1M'
-    year = '1Y'
-    all = 'ALL'
+    day = '1D' # step 5 min
+    week = '7D' # step 10-15 min
+    month = '1M' # step 10-15 min
+    year = '1Y' # step 10-15 min
+    all = 'ALL' # step 10-15 min
 
 @dataclass
 class ChartData:
@@ -104,8 +104,6 @@ class CMCScraper:
 
             if check_only_new and slug in all_slugs:
                 break
-            if slug == 'kingwif':
-                print()
 
             new_currency = Currency(
                 slug=slug,
