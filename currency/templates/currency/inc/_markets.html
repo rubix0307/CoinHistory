@@ -13,6 +13,7 @@
                     <th class="left">Volume %</th>
                     <th class="left">Liquidity Score</th>
                     <th class="left">Last updated</th>
+                    <th class="left">Date added</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,6 +27,7 @@
                         <th>{{ pair.volume_percent|floatformat:2 }}</th>
                         <th>{{ pair.effective_liquidity|floatformat:0 }}</th>
                         <th>{{ pair.last_updated }}</th>
+                        <th>{{ pair.date_added }}</th>
                     </tr>
                 {% endfor %}
             </tbody>

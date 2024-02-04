@@ -22,6 +22,7 @@ class Pair(models.Model):
     index_price = models.IntegerField()
     is_verified = models.BooleanField()
     last_updated = models.DateTimeField()
+    date_added = models.DateTimeField(default=timezone.now())
     outlier_detected = models.IntegerField()
     por_audit_status = models.IntegerField()
     price = models.DecimalField(max_digits=25, decimal_places=15)
