@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 {% block title %}Currency dashboard{% endblock %}
 
 {% block content %}
@@ -9,8 +10,8 @@
                 <tr>
                     <th class="left">#</th>
                     <th class="left">Name</th>
-                    <th>Blockchain</th>
-                    <th>Last updated</th>
+                    <th>Launched</th>
+                    <th>Updated</th>
                     <th>Added</th>
                 </tr>
             </thead>
@@ -19,9 +20,9 @@
                     <tr>
                         <th class="left">{{ forloop.counter }}</th>
                         <th class="left"><a href="{% url 'currency_detail' slug=currency.slug %}" class="caption">{% if currency.logo %}<img class="logo" alt="Logo for {{ currency.name }}" src="{{ currency.logo }}">{% endif %}{{ currency.name }} <div class="symbol">{{ currency.symbol }}</div></a></th>
-                        <th>{{ currency.platform }}</th>
-                        <th>{{ currency.last_updated }}</th>
-                        <th>{{ currency.date_added }}</th>
+                        <th>{{ currency.date_launched|default:'' }}</th>
+                        <th>{{ currency.date_updated|default:'' }}</th>
+                        <th>{{ currency.date_added|default:'' }}</th>
                     </tr>
                 {% endfor %}
             </tbody>

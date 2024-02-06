@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for pair in currency.pairs.all %}
+                {% for pair in currency.pair.all %}
                     <tr>
                         <th class="left">{{ forloop.counter }}</th>
                         <th class="left">{{ pair.exchange_name }}</th>
@@ -26,7 +26,7 @@
                         <th>{{ pair.volume_usd|div:1000|floatformat:3 }}</th>
                         <th>{{ pair.volume_percent|floatformat:2 }}</th>
                         <th>{{ pair.effective_liquidity|floatformat:0 }}</th>
-                        <th>{{ pair.last_updated }}</th>
+                        <th>{{ pair.date_updated }}</th>
                         <th>{{ pair.date_added }}</th>
                     </tr>
                 {% endfor %}

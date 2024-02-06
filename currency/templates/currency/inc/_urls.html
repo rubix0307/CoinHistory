@@ -1,0 +1,11 @@
+{% if currency.url.all %}
+    <div class="tags">
+        <h3>URLs</h3>
+        <ul>
+            {% for url in currency.url.all %}
+                <li><a href="{{ url.url }}">{{ url.type }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+

@@ -13,7 +13,11 @@ def index(request: WSGIRequest):
 
 
 def currency_detail(request: WSGIRequest, slug: str):
-    currency = Currency.objects.filter(slug=slug).prefetch_related('tags', 'pairs').first()
+    currency = (Currency.objects
+                .filter(slug=slug)
+                .prefetch_related('pair', 'tag', 'price_record', 'url', 'platform', 'audit')
+                .first()
+               )
 
     tp_str = request.GET.get('time_period', '')
     time_period = int(tp_str) if tp_str.isdigit() else 900

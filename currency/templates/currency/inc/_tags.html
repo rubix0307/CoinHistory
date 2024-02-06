@@ -1,8 +1,8 @@
-{% if currency.tags.all %}
+{% if currency.tag.all %}
     <div class="tags">
         <h3>Tags</h3>
         <ul>
-            {% for tag in currency.tags.all %}
+            {% for tag in currency.tag.all %}
                 <li>{{ tag.name }}</li>
             {% endfor %}
         </ul>

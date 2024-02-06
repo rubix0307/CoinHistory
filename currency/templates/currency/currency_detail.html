@@ -4,6 +4,8 @@
 {% block content %}
     <h1><a href="{{ currency.coinmarketcap_url }}">{{ currency.name }}</a></h1>
     {% include 'currency/inc/_tags.html' %}
+    {% include 'currency/inc/_urls.html' %}
+    {% include 'currency/inc/_audits.html' %}
     {% include 'currency/inc/_chart.html' %}
 
     <div class="markets">
