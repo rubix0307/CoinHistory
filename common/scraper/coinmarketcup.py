@@ -1,7 +1,8 @@
 import re
 import os
 import json
-from datetime import timedelta
+from decimal import Decimal
+from datetime import timedelta, datetime
 from dataclasses import dataclass
 
 import django
@@ -15,7 +16,8 @@ from common.edit_text import camel_to_snake
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CoinHistory.settings')
 django.setup()
 
-from currency.models import Currency, Pair, Tag, Value
+from currency.models import Currency, Pair, Tag, Price, Platform, URL, Audit
+
 
 class ChartRange:
     day = '1D' # step 5 min
@@ -83,104 +85,55 @@ class CMCScraper:
         listings_exists = []
         all_slugs = Currency.objects.all().values_list('slug', flat=True)
 
-        all_tags = {t.name: t for t in Tag.objects.all()}
-        currency_tags = []
-
         url = 'https://coinmarketcap.com/new/'
-        response = requests.get(url=url, headers=self.headers)
+        for num_page in range(1,2): # TODO next pages
+            response = requests.get(url=url, headers=self.headers, params={'page': num_page})
 
-        try:
-            response.raise_for_status()
-        except HTTPError as ex:
-            return []
+            try:
+                response.raise_for_status()
+            except HTTPError as ex:
+                return []
 
-        soup = BeautifulSoup(response.text, 'html.parser')
-        rows = soup.find('tbody').find_all('tr')
+            soup = BeautifulSoup(response.text, 'html.parser')
+            rows = soup.find('tbody').find_all('tr')
 
-        for row in rows:
+            for row in rows:
 
-            row_tds = row.find_all('td')
-            slug = row_tds[2].find('a').attrs.get('href').split('/')[2]
+                row_tds = row.find_all('td')
+                slug = row_tds[2].find('a').attrs.get('href').split('/')[2]
 
-            if check_only_new and slug in all_slugs:
-                break
+                if check_only_new and slug in all_slugs:
+                    continue
 
-            new_currency = Currency(
-                slug=slug,
-                coinmarketcap_url=f'https://coinmarketcap.com/currencies/{slug}',
-                platform=row_tds[8].text,
-            )
+                new_currency = Currency(
+                    slug=slug,
+                    coinmarketcap_url=f'https://coinmarketcap.com/currencies/{slug}',
+                )
 
-            if slug in all_slugs:
-                new_currency.last_updated=timezone.now()
-                listings_exists.append(new_currency)
-            else:
-                new_currency.date_added=convert_to_datetime(row_tds[9].text)
-                listings_new.append(new_currency)
-
-            # search info in currency page
-            response_currency_page = requests.get(url=new_currency.coinmarketcap_url, headers=self.headers)
-            soup_currency_page = BeautifulSoup(response_currency_page.text, 'html.parser')
-
-            stats = soup_currency_page.find('div', attrs={'data-module-name': "Coin-stats"})
-            caption = stats.find('div', attrs={'data-role': 'el'})
-
-            # add tags
-            exists_tags = []
-            new_tags = []
-            for a in [a for a in stats.find_all('a', attrs={'class': 'cmc-link'}) if a.attrs['class'] == ['cmc-link']]:
-                if a.text in all_tags.keys():
-                    exists_tags.append(all_tags[a.text])
+                if slug in all_slugs:
+                    new_currency.date_updated=timezone.now().timestamp()
+                    listings_exists.append(new_currency)
                 else:
-                    new_tags.append(Tag(name=a.text, href=a.attrs.get('href')))
+                    new_currency.date_added=convert_to_datetime(row_tds[9].text).timestamp()
+                    listings_new.append(new_currency)
 
-            for t in new_tags:
-                t.save()
-            all_tags.update({t.name: t for t in new_tags})
+        self.update_currencies_data(listings_exists + listings_new)
 
-            tags = exists_tags + new_tags
-            if tags:
-                currency_tags.append([new_currency, tags])
-
-            # set main data
-            new_currency.id = int(soup_currency_page.find('div', attrs={'data-role': 'chip-content-item'}).text)
-            new_currency.name = caption.find('span', attrs={'data-role': 'coin-name'}).attrs.get('title')
-            new_currency.description = soup_currency_page.find('div', id='section-coin-about').contents[1].text
-            new_currency.symbol = caption.find('span', attrs={'data-role': 'coin-symbol'}).text
-            new_currency.logo = caption.find('div', attrs={'data-role': 'coin-logo'}).contents[0].attrs.get('src')
-
-        Currency.objects.bulk_create(listings_new)
-        Currency.objects.bulk_update(listings_exists,  ['name', 'slug', 'description', 'symbol', 'logo', 'coinmarketcap_url', 'platform', 'last_updated'])
-
-        for currency, tags_list in currency_tags:
-
-            currency = currency._meta.model.objects.using('default').get(pk=currency.pk)
-            tags_to_set = [tag._meta.model.objects.using('default').get(pk=tag.pk) for tag in tags_list]
-            currency.tags.set(tags_to_set)
+        return listings_exists + listings_new
 
 
-        return listings_new + listings_exists
-
-    def get_market_pairs(self, *, obj: str | Currency, start: int = 1, limit: int = 10) -> list[Pair] | list:
+    def get_market_pairs(self, *, currency: Currency, start: int = 1, limit: int = 10) -> list[Pair] | list:
         """
-        :param obj: cryptocurrency slug. Ex: bitcoin | Currency.objects.first()
+        :param currency: Currency class object
         :param start: Show pairs starting from the specified number
         :param limit: max pairs count
         :return: list[MarketPair] | []
         """
 
-        if type(obj) == Currency:
-            slug = obj.slug
-            save_pairs = True
-        else:
-            slug = obj
-            save_pairs = False
-
-
         url = "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/market-pairs/latest"
 
         params = {
-            'slug': slug,
+            'slug': currency.slug,
             'start': start,
             'limit': limit,
             'category': 'spot',
@@ -195,15 +148,17 @@ class CMCScraper:
             response.raise_for_status()
             data = json.loads(response.text)
 
-            pairs = [Pair(**{camel_to_snake(k): v for k, v in pair.items() if not k == 'quotes'}) for pair in
+            pairs_data = [{camel_to_snake(k): v for k, v in pair.items() if not k == 'quotes'} for pair in
                     data.get('data', {}).get('marketPairs', {}) if pair.get('isVerified')]
 
-            if save_pairs:
-                Pair.objects.bulk_create(pairs, ignore_conflicts=True)
-                Pair.objects.bulk_update(pairs, fields=['exchange_name', 'dexer_url', 'market_pair', 'price', 'volume_usd', 'volume_percent', 'effective_liquidity', 'last_updated'])
-                obj.pairs.set(pairs)
-                obj.last_updated = timezone.now()
-                obj.save()
+            pairs = []
+            for p_data in pairs_data:
+                p_data.update({'date_updated': int(datetime.strptime(p_data['last_updated'], '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())})
+                del p_data['last_updated']
+                pairs.append(Pair(currency=currency, **p_data))
+
+            Pair.objects.bulk_create(pairs, ignore_conflicts=True)
+            Pair.objects.bulk_update(pairs, fields=[f.name for f in Pair._meta.get_fields() if not f.name in ['market_id', 'currency']])
 
             return pairs
 
@@ -224,6 +179,121 @@ class CMCScraper:
 
         if is_save:
             for cd in chart_data:
-                Value.objects.update_or_create(**cd.dict())
+                Price.objects.update_or_create(**cd.dict())
         return chart_data
+
+    def get_json_data_by_currency_page(self, currency: Currency) -> dict:
+        """
+        :param currency:
+        :return: dict (a lot of data for page build)
+        """
+
+        response = requests.get(currency.coinmarketcap_url, headers=self.headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        data_script = soup.find('script', attrs={'id':'__NEXT_DATA__'})
+        data = json.loads(data_script.text)
+
+        data_detail = data['props']['pageProps']['detailRes']['detail']
+
+        stats = soup.find('div', attrs={'data-module-name': "Coin-stats"})
+        caption = stats.find('div', attrs={'data-role': 'el'})
+        data_detail['logo'] = caption.find('div', attrs={'data-role': 'coin-logo'}).contents[0].attrs.get('src')
+
+        return data
+
+    def update_currencies_data(self, currencies: list[Currency]) -> list[Currency]:
+        for around_num, currency in enumerate(currencies):
+            print(f'{around_num=}')
+            data = self.get_json_data_by_currency_page(currency=currency)
+            data_detail = data['props']['pageProps']['detailRes']['detail']
+
+            s_rep_circ_supply = data_detail.get('selfReportedCirculatingSupply')
+
+            try:
+                currency.id = data_detail['id']
+                currency.name = data_detail['name']
+                currency.slug = data_detail['slug']
+                currency.description = data_detail['description']
+                currency.symbol = data_detail['symbol']
+                currency.logo = data_detail['logo']
+                currency.coinmarketcap_url = f'https://coinmarketcap.com/currencies/{data_detail["slug"]}/'
+                currency.dex_volume = data_detail.get('dexVolume')
+                currency.self_reported_circulating_supply = float(s_rep_circ_supply) if s_rep_circ_supply else None
+                currency.total_supply = data_detail['statistics'].get('totalSupply')
+                currency.max_supply = data_detail['statistics'].get('maxSupply')
+                currency.fully_diluted_market_cap = data_detail['statistics'].get('fullyDilutedMarketCap')
+                currency.is_infinite_max_supply = data_detail['isInfiniteMaxSupply']
+                currency.is_audited = data_detail['isAudited']
+                currency.status = data_detail['status']
+                currency.category = data_detail['category']
+                currency.launch_price = data_detail['launchPrice']
+                currency.date_launched = int(datetime.fromisoformat(data_detail['dateLaunched'].replace('Z', '+00:00')).timestamp()) if data_detail['dateLaunched'] else None # TODO
+                currency.date_updated = int(timezone.now().timestamp())
+                currency.save()
+
+            except Exception as ex:
+                print()
+
+
+            try:
+                urls = [{'type': k, 'url': i}
+                    for k, v in data_detail['urls'].items() if v
+                    for i in v]
+
+                for url in urls:
+                    URL.objects.update_or_create(currency=currency, **url)
+            except Exception as ex:
+                print()
+
+            try:
+                for tag in data_detail['tags']:
+                    Tag.objects.update_or_create(currency=currency, **tag)
+            except Exception as ex:
+                print()
+
+
+            try:
+                platform_fields = [f.name for f in Platform._meta.get_fields()]
+                platforms = [{camel_to_snake(k):v
+                              for k,v in platform.items()
+                              if camel_to_snake(k) in platform_fields}
+                             for platform in data_detail['platforms']]
+            except Exception as ex:
+                print()
+
+            try:
+                for platform in platforms:
+                    Platform.objects.update_or_create(currency=currency, **platform)
+            except Exception as ex:
+                print()
+
+
+            try:
+                for audit_info in data_detail.get('auditInfos',[]):
+                    audit_time = audit_info.get('auditTime')
+                    if 'T' in audit_time:
+                        audit_time = int(datetime.strptime(audit_time, '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())
+                    else:
+                        audit_time = int(datetime.strptime(audit_time, '%Y-%m-%d').timestamp())
+
+                    audit_data = {
+                        'auditor': audit_info.get('auditor'),
+                        'audit_status':  audit_info.get('auditStatus'),
+                        'audit_time':  audit_time,
+                        'report_url':  audit_info.get('reportUrl'),
+                    }
+
+                    score = audit_info.get('score')
+                    if score and score != 'N/A':
+                        audit_data.update({'score': score})
+
+                    Audit.objects.update_or_create(currency=currency, **audit_data)
+
+            except Exception as ex:
+                print()
+
+            pairs = self.get_market_pairs(currency=currency, limit=100)
+
+        return currencies
 
