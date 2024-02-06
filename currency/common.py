@@ -1,8 +1,8 @@
 from dataclasses import dataclass, asdict
 from typing import get_type_hints
 from django.db import connections
-from .models import Value
-
+from .models import Price
+from common.edit_text import camel_to_snake
 
 @dataclass
 class CandleData:
@@ -25,7 +25,7 @@ def get_candles_chart_data(*, time_period: int, currency_id: int) -> list[Candle
     :return: list[CandleData]
     """
 
-    db_table = Value._meta.db_table
+    db_table = Price._meta.db_table
     raw_sql = f"""
         -- make time frame for all currency data
         WITH RECURSIVE TimeSeries (time) AS (
