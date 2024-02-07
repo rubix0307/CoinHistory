@@ -1,5 +1,7 @@
 function getChart(elementId, height= 500, fractionDigits= 13) {
-    return LightweightCharts.createChart(document.getElementById(elementId), {
+    let element = document.getElementById(elementId)
+    return LightweightCharts.createChart(element, {
+        width: element.offsetWidth - 10,
         height: height,
         timeScale: {
             timeVisible: true,

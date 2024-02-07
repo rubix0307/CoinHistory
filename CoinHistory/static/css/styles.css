@@ -7,6 +7,7 @@ body {
 
 h1,h2,h3,h4,h5,h6 {
     text-align: center;
+    color: #0D1422;
 }
 
 header {
@@ -144,7 +145,7 @@ form.auth input[type="submit"]{
     border-radius: 14px;
     border: 2px #f1f1f1 solid;
     padding: 6px;
-    max-width: 980px;
+    width: 980px;
     margin: 0 auto;
 
     .header {
@@ -199,4 +200,68 @@ form.auth input[type="submit"]{
         }
     }
 }
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+main aside {
+    margin-right: 40px;
+    max-width: 400px;
 
+    .list {
+        /* background-color: red; */
+        width: 100%;
+        border: 2px #f1f1f1 solid;
+        border-radius: 10px;
+        margin-bottom: 5px;
+        padding: 2px 2px 10px 2px;
+
+    }
+    .list ul {
+        padding: 0 0 0 8px;
+        display: flex;
+        align-items: flex-start;
+        align-content: flex-start;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        margin: 0;
+    }
+    .list ul li{
+        padding: 0;
+        text-transform: capitalize;
+        list-style: none;
+    }
+    .list ul li a{
+        color: black;
+        text-decoration: none;
+    }
+    .list ul li a.faviconLink{
+        display: flex;
+        flex-direction: row;
+    }
+    .list ul li a.faviconLink .favicon{
+        background-size: cover;
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+
+}
+main aside h1{
+    display: flex;
+    flex-direction: column;
+}
+main aside h1 a{
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
+    color: #0D1422;
+
+}
+main aside h1 .symbol{
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+    color: #616E85;
+}

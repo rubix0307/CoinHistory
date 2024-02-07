@@ -3,30 +3,33 @@
 {% block title %}Currency dashboard{% endblock %}
 
 {% block content %}
-    <h2>Currency dashboard</h2>
-    <div class="currency-dashboard-place">
-        <table class="currency-dashboard">
-            <thead>
-                <tr>
-                    <th class="left">#</th>
-                    <th class="left">Name</th>
-                    <th>Launched</th>
-                    <th>Updated</th>
-                    <th>Added</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for currency in currencies %}
+    <div class="feed">
+        <h2>Currency dashboard</h2>
+        <div class="currency-dashboard-place">
+            <table class="currency-dashboard">
+                <thead>
                     <tr>
-                        <th class="left">{{ forloop.counter }}</th>
-                        <th class="left"><a href="{% url 'currency_detail' slug=currency.slug %}" class="caption">{% if currency.logo %}<img class="logo" alt="Logo for {{ currency.name }}" src="{{ currency.logo }}">{% endif %}{{ currency.name }} <div class="symbol">{{ currency.symbol }}</div></a></th>
-                        <th>{{ currency.date_launched|default:'' }}</th>
-                        <th>{{ currency.date_updated|default:'' }}</th>
-                        <th>{{ currency.date_added|default:'' }}</th>
+                        <th class="left">#</th>
+                        <th class="left">Name</th>
+                        <th>Launched</th>
+                        <th>Updated</th>
+                        <th>Added</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for currency in currencies %}
+                        <tr>
+                            <th class="left">{{ forloop.counter }}</th>
+                            <th class="left"><a href="{% url 'currency_detail' slug=currency.slug %}" class="caption">{% if currency.logo %}<img class="logo" alt="Logo for {{ currency.name }}" src="{{ currency.logo }}" loading="lazy">{% endif %}{{ currency.name }} <div class="symbol">{{ currency.symbol }}</div></a></th>
+                            <th>{{ currency.date_launched|default:'' }}</th>
+                            <th>{{ currency.date_updated|default:'' }}</th>
+                            <th>{{ currency.date_added|default:'' }}</th>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
 
 {% endblock %}

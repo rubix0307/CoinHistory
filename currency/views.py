@@ -20,7 +20,7 @@ def currency_detail(request: WSGIRequest, slug: str):
                )
 
     tp_str = request.GET.get('time_period', '')
-    time_period = int(tp_str) if tp_str.isdigit() else 900
+    time_period = int(tp_str) if tp_str.isdigit() else 21600
     chart_data = get_candles_chart_data(time_period=time_period, currency_id=currency.id)
 
     context = {

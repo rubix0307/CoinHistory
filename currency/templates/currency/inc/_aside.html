@@ -1,0 +1,17 @@
+<aside>
+    <h1><a target="_blank" href="{{ currency.coinmarketcap_url }}">{{ currency.name }}</a><span class="symbol">{{ currency.symbol }}</span></h1>
+    
+    {% with 'Urls' as list_caption %}
+        {% with currency.url.all as urls %}
+            {% include 'currency/inc/_urls.html' %}
+        {% endwith %}
+    {% endwith %}
+
+    {% with 'Audits' as list_caption %}
+        {% with currency.audit.all as urls %}
+            {% include 'currency/inc/_urls.html' %}
+        {% endwith %}
+    {% endwith %}
+
+    {% include 'currency/inc/_tags.html' %}
+</aside>

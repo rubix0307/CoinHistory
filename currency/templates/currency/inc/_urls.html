@@ -1,9 +1,14 @@
-{% if currency.url.all %}
-    <div class="tags">
-        <h3>URLs</h3>
+{% if urls %}
+    <div class="list">
+        <h3>{{ list_caption }}</h3>
         <ul>
-            {% for url in currency.url.all %}
-                <li><a href="{{ url.url }}">{{ url.type }}</a></li>
+            {% for url in urls %}
+                <li>
+                    <a target="_blank" href="{{ url.url }}{{ url.report_url }}" class="faviconLink">
+                        <div class="favicon" style="background: url('https://www.google.com/s2/favicons?domain={{ url.url }}{{ url.report_url }}') no-repeat;"></div>
+                        {{ url.type }}{{ url.auditor }}
+                    </a>
+                </li>
             {% endfor %}
         </ul>
     </div>
