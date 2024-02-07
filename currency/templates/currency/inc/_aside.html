@@ -1,16 +1,49 @@
 <aside>
-    <h1><a target="_blank" href="{{ currency.coinmarketcap_url }}">{{ currency.name }}</a><span class="symbol">{{ currency.symbol }}</span></h1>
-    
+    <h1>
+        <img src="{{ currency.logo }}" alt="Currency logo" style="width: 20%; margin: 0 auto;">
+        <a target="_blank" href="{{ currency.coinmarketcap_url }}">{{ currency.name }}</a>
+        <span class="symbol">{{ currency.symbol }}</span>
+    </h1>
+
+    <div class="value_items">
+        <div class="value_item">
+            <div class="name">Price</div>
+            <div class="value">{{ last_price|default:'N/A' }}</div>
+        </div>
+
+        <div class="value_item">
+            <div class="name">Circulating supply</div>
+            <div class="value">{{ currency.circulating_supply|default:'N/A' }}</div>
+        </div>
+
+        <div class="value_item">
+            <div class="name">Total supply</div>
+            <div class="value">{{ currency.total_supply|default:'N/A' }}</div>
+        </div>
+
+        <div class="value_item">
+            <div class="name">Max. supply</div>
+            <div class="value">{{ currency.max_supply|default:'N/A' }}</div>
+        </div>
+
+        <div class="value_item">
+            <div class="name">Fully diluted market cap</div>
+            <div class="value">{{ currency.fully_diluted_market_cap|default:'N/A' }}</div>
+        </div>
+
+
+    </div>
+
+    {% with currency.url.all as urls %}
     {% with 'Urls' as list_caption %}
-        {% with currency.url.all as urls %}
-            {% include 'currency/inc/_urls.html' %}
-        {% endwith %}
+        {% include 'currency/inc/_urls.html' %}
+    {% endwith %}
     {% endwith %}
 
+    {% with currency.audit.all as urls %}
     {% with 'Audits' as list_caption %}
-        {% with currency.audit.all as urls %}
-            {% include 'currency/inc/_urls.html' %}
-        {% endwith %}
+        {% include 'currency/inc/_urls.html' %}
+    {% endwith %}
     {% endwith %}
 
     {% include 'currency/inc/_tags.html' %}

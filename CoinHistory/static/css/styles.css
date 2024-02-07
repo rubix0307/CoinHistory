@@ -3,6 +3,7 @@ body {
     padding: 0;
     margin: 0;
     /*min-height: 3000px;*/
+    font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -228,7 +229,6 @@ main aside {
         margin: 0;
     }
     .list ul li{
-        padding: 0;
         text-transform: capitalize;
         list-style: none;
     }
@@ -243,8 +243,9 @@ main aside {
     .list ul li a.faviconLink .favicon{
         background-size: cover;
         width: 20px;
-        height: 20px;
+        height: auto;
         margin-right: 5px;
+        margin-top: 3px;
     }
 
 }
@@ -271,7 +272,29 @@ main aside h1 .symbol{
 .about {
     font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
     color: #58667e;
+    word-break: break-word;
+    line-height: 150%;
+    box-sizing: border-box;
+    border-spacing: 0;
+    pointer-events: auto;
 }
 footer {
     margin-top: 150px;
+}
+
+.value_items {
+    border-radius: 10px;
+    margin-bottom: 10px;
+    width: fit-content;
+
+    .value_item {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        .value {
+            color: #58667e;
+        }
+    }
 }

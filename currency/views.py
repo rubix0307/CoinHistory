@@ -27,6 +27,7 @@ def currency_detail(request: WSGIRequest, slug: str):
         'currency': currency,
         'chart_data': chart_data,
         'smallest_grading': smallest_grading,
+        'last_price': chart_data[-1].close if chart_data else 0
     }
 
     return render(request, 'currency/currency_detail.html', context=context)
