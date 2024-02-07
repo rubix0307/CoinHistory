@@ -1,6 +1,8 @@
+import random
 import re
 import os
 import json
+import time
 from decimal import Decimal
 from datetime import timedelta, datetime
 from dataclasses import dataclass
@@ -64,7 +66,7 @@ class CMCScraper:
                 "Accept-Encoding": "gzip, deflate, br",
                 "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
                 "Cache-Control": "no-cache",
-                "Cookie": "cmc_ab_group=navBar-B; gtm_session_first=%222024-01-19T10%3A46%3A55.627Z%22; _pbjs_userid_consent_data=3524755945110770; _sharedID=f8e3d3fc-0f56-47f1-a2cb-93f2642a70e9; _gid=GA1.2.351572290.1705661217; _fbp=fb.1.1705661222037.1897222133; bnc-uuid=9e197142-f3a7-4b1d-a595-4c04b8c75b7f; _gcl_au=1.1.768717298.1705661247; se_gd=VQIWxRRILHVGRYRIADwxgZZVQHQUXBRU1sWZbWkNlRSVQVVNWUcd1; se_gsd=eyMnPytlLDQmMysvNRwxNDIsB1cLBwFTWVtBVVVRU1RUElNT1; BNC_FV_KEY_EXPIRE=1705747802857; s=Fe26.2**d83021ed19aa4148aa093b5f6ac471bbe014afb3dc12f12e824307f236f80cb0*qntcts8QT30cD65HK7FbUg*wQp_1xq3YTqI5Hv1jw_kKDkuEG64pYmamTxO_NzJp9CamGFi-T5JQMsvAx4B3WnV2vwAsxyXEFT9KK5hAL5UZ9mb-BII5eh0uVrzeH4CPt3wji5vSnCmqbXxAmGxzMOpRIB1I4qXCFvgiSmES3MNztEDjNNhbOKuLpDRsjTNLSMjAXcNvbsKI-1-zm1eyR49_QhmT88SsGx4SZc_AaqHFkuKLASWUfLOIvye92030zUvjJ6-uB2ap9vhjrPvJeBJJlpq3dJNQvluXRarstS-ybQc02WS2ChlmZblGi8_4dHcMS4l8SgjI5gq16WoujWDZNqDONGj5p1JySuR_TuFN8zelVWHFxGMhpLcezMxv9qqsqcDQCsv8vCqwt6x1OAsxGmlt77oQ5wYeLG8DJ_1bKP5aSj6WbVA84Uh0vJdWltYBosJGkpuGQeHQeQuwuvXnQgBooxFGFUlTVkri5XM4YN5y6S7PoVga7gphE3SZFnZwFvl1Zk-ceYe8LauttnJX8It2KzQjx3CN8EaeZUdY0jY39WSc64emoJcYj3So6DDFG8e8yTW2WOjel5_3-ZiiwBbdZU4aDdAlsIJD1MrYui7elSUdcTEVv-zTTz3NNHqKRFx-VCBC4g1zidXuC6sM7PrUz8JaALGyB2kl3tF288YBb8CP5_5FQQgxpHGN5EflMP_QbodnFgRinV2b7jSfiU8K2cdhom_P1Sx8AYdZopcV4uR0ejuv6cMo6McerzgH3hcxkA4X8hgCe-rcCww-7MNnVJQxAMc5A_ShH1MUlpxdFiSasBC0kjJ0_ZJejIDJgzUEHl8BvJRL8EXFl03yz291S9851XsAYz-nVBHiTMDCs06orIEHeZw9VHw_GT0nEG_7PAy-zJwQZViEanI91QAKwqWkUAuZcdGe5xykJLUMOElrSwEwOOrGTOa3PoAIqdoSuLCSNnnmy6cr1PIibCdeI0xgIoZ8nDVtvqeo__wu11p0IPaPoVTXvEoBzE0eMc1Ipg95LoI2mAuQOF4TopMDKvGusDCE2xy-RMREijjWhSArplmvJmUdvy0bVkk5qZMtOTmyyiSOsjEYqz-halPzPhxu3nhrRrUq7lphA**91941bb929a2b805258bf6983c571957e032e7bf013ef661dd67506f13362e42*2Y21_trvHgbGHclFY-FVWwLWI1SW5BiGbk6wSF90v98; Authorization=BearereyJ0eXBlIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJyb2xlcyI6ImFjY291bnRXZWIsYWNjb3VudE1vYmlsZSxhY2NvdW50IiwidWlkIjo5MjE3ODk0MywiaXNzIjoiY21jLWF1dGgiLCJpYXQiOjE3MDU2NzI2MjgsInN1YiI6IjY0MWM0ODcwYmZiNGZkNzQ0MGU3YWQ2NiIsImV4cCI6MTcxMzQ0ODYyOH0.pIj8_u_INEGHCoHzFGUj8VlEa0aJgJR5Vi_mzDhx0ig; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%22641c4870bfb4fd7440e7ad66%22%2C%22first_id%22%3A%2218d2154b45a515-07c2f7a46a7939-26001951-2073600-18d2154b45b89b%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E7%9B%B4%E6%8E%A5%E6%B5%81%E9%87%8F%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC_%E7%9B%B4%E6%8E%A5%E6%89%93%E5%BC%80%22%2C%22%24latest_referrer%22%3A%22%22%7D%2C%22identities%22%3A%22eyIkaWRlbnRpdHlfY29va2llX2lkIjoiMThkMjE1NGI0NWE1MTUtMDdjMmY3YTQ2YTc5MzktMjYwMDE5NTEtMjA3MzYwMC0xOGQyMTU0YjQ1Yjg5YiIsIiRpZGVudGl0eV9sb2dpbl9pZCI6IjY0MWM0ODcwYmZiNGZkNzQ0MGU3YWQ2NiJ9%22%2C%22history_login_id%22%3A%7B%22name%22%3A%22%24identity_login_id%22%2C%22value%22%3A%22641c4870bfb4fd7440e7ad66%22%7D%2C%22%24device_id%22%3A%2218d2154b45a515-07c2f7a46a7939-26001951-2073600-18d2154b45b89b%22%7D; cmc-theme=day; cmc-language=en; __gads=ID=9351f465ef99c91f:T=1705661219:RT=1705919408:S=ALNI_MZkjYvs0mOIR4gfyOAynJ6vG8owWg; __gpi=UID=00000d4405cba0a2:T=1705661219:RT=1705919408:S=ALNI_MYEoPGcIr4rGz2j-f4pPji7lKAxMQ; cto_bundle=6_ZHjF94c2JQUVlLWTlSeUxGdXBod3d5ZCUyRjJ1emtaUkRidlkwUnlRSldlNHk2MlRyanB1emUzN2JkUFh6Sk9NWm5xamplTHlHckpmeiUyRmt1cGlSTnAlMkZGaVFZd2Q5c0kwOUdTSVVpQmUyQzlDRTJBS2w1JTJCaEJLMSUyQjM2OWxheDJGNHZ1WDZYVDFSbzJ1bnJBNVpkTVpSTXZUdmVnZ3pmanR4d29pcG1scUp5MHBMOTI4JTNE; x-csrf-token=50eb77a8e429f0cc9841daf1475471108f9985862e666f0b17bc35722d8a26dc28b5965aa295cb63061ca650001cefc295f12fc353377b3b3da26c92f85a9d4d11f8b5d2e996df0560fc0324cd0952d7c92d259a24654af82552cb7d779968cf373e9638319a57e5d552c6d403618ea8492f52cae42f3cd2cd6cbed97394a84f; _dc_gtm_UA-40475998-1=1; gtm_session_last=%222024-01-22T12%3A21%3A11.634Z%22; OptanonConsent=isGpcEnabled=0&datestamp=Mon+Jan+22+2024+13%3A21%3A12+GMT%2B0100+(%D0%A6%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D0%95%D0%B2%D1%80%D0%BE%D0%BF%D0%B0%2C+%D1%81%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%D0%BD%D0%BE%D0%B5+%D0%B2%D1%80%D0%B5%D0%BC%D1%8F)&version=202310.2.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=0103d6dc-d44e-402d-8ff0-7e2212a39893&interactionCount=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0003%3A1%2CC0004%3A1%2CC0002%3A1&AwaitingReconsent=false; _ga=GA1.1.732502775.1705661216; _ga_VZT5E68L14=GS1.1.1705925680.17.1.1705926104.0.0.0; _gali=__next",
+                # "Cookie": "cmc_ab_group=navBar-B; gtm_session_first=%222024-01-19T10%3A46%3A55.627Z%22; _pbjs_userid_consent_data=3524755945110770; _sharedID=f8e3d3fc-0f56-47f1-a2cb-93f2642a70e9; _gid=GA1.2.351572290.1705661217; _fbp=fb.1.1705661222037.1897222133; bnc-uuid=9e197142-f3a7-4b1d-a595-4c04b8c75b7f; _gcl_au=1.1.768717298.1705661247; se_gd=VQIWxRRILHVGRYRIADwxgZZVQHQUXBRU1sWZbWkNlRSVQVVNWUcd1; se_gsd=eyMnPytlLDQmMysvNRwxNDIsB1cLBwFTWVtBVVVRU1RUElNT1; BNC_FV_KEY_EXPIRE=1705747802857; s=Fe26.2**d83021ed19aa4148aa093b5f6ac471bbe014afb3dc12f12e824307f236f80cb0*qntcts8QT30cD65HK7FbUg*wQp_1xq3YTqI5Hv1jw_kKDkuEG64pYmamTxO_NzJp9CamGFi-T5JQMsvAx4B3WnV2vwAsxyXEFT9KK5hAL5UZ9mb-BII5eh0uVrzeH4CPt3wji5vSnCmqbXxAmGxzMOpRIB1I4qXCFvgiSmES3MNztEDjNNhbOKuLpDRsjTNLSMjAXcNvbsKI-1-zm1eyR49_QhmT88SsGx4SZc_AaqHFkuKLASWUfLOIvye92030zUvjJ6-uB2ap9vhjrPvJeBJJlpq3dJNQvluXRarstS-ybQc02WS2ChlmZblGi8_4dHcMS4l8SgjI5gq16WoujWDZNqDONGj5p1JySuR_TuFN8zelVWHFxGMhpLcezMxv9qqsqcDQCsv8vCqwt6x1OAsxGmlt77oQ5wYeLG8DJ_1bKP5aSj6WbVA84Uh0vJdWltYBosJGkpuGQeHQeQuwuvXnQgBooxFGFUlTVkri5XM4YN5y6S7PoVga7gphE3SZFnZwFvl1Zk-ceYe8LauttnJX8It2KzQjx3CN8EaeZUdY0jY39WSc64emoJcYj3So6DDFG8e8yTW2WOjel5_3-ZiiwBbdZU4aDdAlsIJD1MrYui7elSUdcTEVv-zTTz3NNHqKRFx-VCBC4g1zidXuC6sM7PrUz8JaALGyB2kl3tF288YBb8CP5_5FQQgxpHGN5EflMP_QbodnFgRinV2b7jSfiU8K2cdhom_P1Sx8AYdZopcV4uR0ejuv6cMo6McerzgH3hcxkA4X8hgCe-rcCww-7MNnVJQxAMc5A_ShH1MUlpxdFiSasBC0kjJ0_ZJejIDJgzUEHl8BvJRL8EXFl03yz291S9851XsAYz-nVBHiTMDCs06orIEHeZw9VHw_GT0nEG_7PAy-zJwQZViEanI91QAKwqWkUAuZcdGe5xykJLUMOElrSwEwOOrGTOa3PoAIqdoSuLCSNnnmy6cr1PIibCdeI0xgIoZ8nDVtvqeo__wu11p0IPaPoVTXvEoBzE0eMc1Ipg95LoI2mAuQOF4TopMDKvGusDCE2xy-RMREijjWhSArplmvJmUdvy0bVkk5qZMtOTmyyiSOsjEYqz-halPzPhxu3nhrRrUq7lphA**91941bb929a2b805258bf6983c571957e032e7bf013ef661dd67506f13362e42*2Y21_trvHgbGHclFY-FVWwLWI1SW5BiGbk6wSF90v98; Authorization=BearereyJ0eXBlIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJyb2xlcyI6ImFjY291bnRXZWIsYWNjb3VudE1vYmlsZSxhY2NvdW50IiwidWlkIjo5MjE3ODk0MywiaXNzIjoiY21jLWF1dGgiLCJpYXQiOjE3MDU2NzI2MjgsInN1YiI6IjY0MWM0ODcwYmZiNGZkNzQ0MGU3YWQ2NiIsImV4cCI6MTcxMzQ0ODYyOH0.pIj8_u_INEGHCoHzFGUj8VlEa0aJgJR5Vi_mzDhx0ig; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%22641c4870bfb4fd7440e7ad66%22%2C%22first_id%22%3A%2218d2154b45a515-07c2f7a46a7939-26001951-2073600-18d2154b45b89b%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E7%9B%B4%E6%8E%A5%E6%B5%81%E9%87%8F%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC_%E7%9B%B4%E6%8E%A5%E6%89%93%E5%BC%80%22%2C%22%24latest_referrer%22%3A%22%22%7D%2C%22identities%22%3A%22eyIkaWRlbnRpdHlfY29va2llX2lkIjoiMThkMjE1NGI0NWE1MTUtMDdjMmY3YTQ2YTc5MzktMjYwMDE5NTEtMjA3MzYwMC0xOGQyMTU0YjQ1Yjg5YiIsIiRpZGVudGl0eV9sb2dpbl9pZCI6IjY0MWM0ODcwYmZiNGZkNzQ0MGU3YWQ2NiJ9%22%2C%22history_login_id%22%3A%7B%22name%22%3A%22%24identity_login_id%22%2C%22value%22%3A%22641c4870bfb4fd7440e7ad66%22%7D%2C%22%24device_id%22%3A%2218d2154b45a515-07c2f7a46a7939-26001951-2073600-18d2154b45b89b%22%7D; cmc-theme=day; cmc-language=en; __gads=ID=9351f465ef99c91f:T=1705661219:RT=1705919408:S=ALNI_MZkjYvs0mOIR4gfyOAynJ6vG8owWg; __gpi=UID=00000d4405cba0a2:T=1705661219:RT=1705919408:S=ALNI_MYEoPGcIr4rGz2j-f4pPji7lKAxMQ; cto_bundle=6_ZHjF94c2JQUVlLWTlSeUxGdXBod3d5ZCUyRjJ1emtaUkRidlkwUnlRSldlNHk2MlRyanB1emUzN2JkUFh6Sk9NWm5xamplTHlHckpmeiUyRmt1cGlSTnAlMkZGaVFZd2Q5c0kwOUdTSVVpQmUyQzlDRTJBS2w1JTJCaEJLMSUyQjM2OWxheDJGNHZ1WDZYVDFSbzJ1bnJBNVpkTVpSTXZUdmVnZ3pmanR4d29pcG1scUp5MHBMOTI4JTNE; x-csrf-token=50eb77a8e429f0cc9841daf1475471108f9985862e666f0b17bc35722d8a26dc28b5965aa295cb63061ca650001cefc295f12fc353377b3b3da26c92f85a9d4d11f8b5d2e996df0560fc0324cd0952d7c92d259a24654af82552cb7d779968cf373e9638319a57e5d552c6d403618ea8492f52cae42f3cd2cd6cbed97394a84f; _dc_gtm_UA-40475998-1=1; gtm_session_last=%222024-01-22T12%3A21%3A11.634Z%22; OptanonConsent=isGpcEnabled=0&datestamp=Mon+Jan+22+2024+13%3A21%3A12+GMT%2B0100+(%D0%A6%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+%D0%95%D0%B2%D1%80%D0%BE%D0%BF%D0%B0%2C+%D1%81%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%D0%BD%D0%BE%D0%B5+%D0%B2%D1%80%D0%B5%D0%BC%D1%8F)&version=202310.2.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=0103d6dc-d44e-402d-8ff0-7e2212a39893&interactionCount=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0003%3A1%2CC0004%3A1%2CC0002%3A1&AwaitingReconsent=false; _ga=GA1.1.732502775.1705661216; _ga_VZT5E68L14=GS1.1.1705925680.17.1.1705926104.0.0.0; _gali=__next",
                 "Pragma": "no-cache",
                 "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
                 "Sec-Ch-Ua-Mobile": "?0",
@@ -74,8 +76,8 @@ class CMCScraper:
                 "Sec-Fetch-Site": "same-origin",
                 "Sec-Fetch-User": "?1",
                 "Upgrade-Insecure-Requests": "1",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "X-Request-Id": x_request_id,
+                "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/{random.randint(400, 537)}.36 (KHTML, like Gecko) Chrome/{random.randint(100, 120)}.0.0.0 Safari/{random.randint(400, 537)}.36",
+                # "X-Request-Id": x_request_id,
             }
         else:
             self.headers = headers
@@ -116,8 +118,6 @@ class CMCScraper:
                 else:
                     new_currency.date_added=convert_to_datetime(row_tds[9].text).timestamp()
                     listings_new.append(new_currency)
-
-        self.update_currencies_data(listings_exists + listings_new)
 
         return listings_exists + listings_new
 
@@ -182,7 +182,7 @@ class CMCScraper:
                 Price.objects.update_or_create(**cd.dict())
         return chart_data
 
-    def get_json_data_by_currency_page(self, currency: Currency) -> dict:
+    def get_json_data_by_currency_page(self, currency: Currency) -> dict | bool:
         """
         :param currency:
         :return: dict (a lot of data for page build)
@@ -192,7 +192,10 @@ class CMCScraper:
         soup = BeautifulSoup(response.text, 'html.parser')
 
         data_script = soup.find('script', attrs={'id':'__NEXT_DATA__'})
-        data = json.loads(data_script.text)
+        try:
+            data = json.loads(data_script.text)
+        except Exception as ex:
+            return False
 
         data_detail = data['props']['pageProps']['detailRes']['detail']
 
@@ -203,9 +206,13 @@ class CMCScraper:
         return data
 
     def update_currencies_data(self, currencies: list[Currency]) -> list[Currency]:
+
         for around_num, currency in enumerate(currencies):
-            print(f'{around_num=}')
+
             data = self.get_json_data_by_currency_page(currency=currency)
+            if not data:
+                continue
+
             data_detail = data['props']['pageProps']['detailRes']['detail']
 
             s_rep_circ_supply = data_detail.get('selfReportedCirculatingSupply')
@@ -219,6 +226,7 @@ class CMCScraper:
                 currency.logo = data_detail['logo']
                 currency.coinmarketcap_url = f'https://coinmarketcap.com/currencies/{data_detail["slug"]}/'
                 currency.dex_volume = data_detail.get('dexVolume')
+                currency.circulating_supply = data_detail['statistics']['circulatingSupply']
                 currency.self_reported_circulating_supply = float(s_rep_circ_supply) if s_rep_circ_supply else None
                 currency.total_supply = data_detail['statistics'].get('totalSupply')
                 currency.max_supply = data_detail['statistics'].get('maxSupply')
@@ -294,6 +302,6 @@ class CMCScraper:
                 print()
 
             pairs = self.get_market_pairs(currency=currency, limit=100)
+            chart_data = self.get_chart_data(currency=currency, chart_range=ChartRange.day)
 
         return currencies
-
