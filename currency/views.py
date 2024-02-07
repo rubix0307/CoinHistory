@@ -19,14 +19,14 @@ def currency_detail(request: WSGIRequest, slug: str):
                 .first()
                )
 
-    tp_str = request.GET.get('time_period', '')
-    time_period = int(tp_str) if tp_str.isdigit() else 21600
-    chart_data = get_candles_chart_data(time_period=time_period, currency_id=currency.id)
+    s_grading_str = request.GET.get('smallest_grading', '')
+    smallest_grading = int(s_grading_str) if s_grading_str.isdigit() else 21600
+    chart_data = get_candles_chart_data(smallest_grading=smallest_grading, currency_id=currency.id)
 
     context = {
         'currency': currency,
         'chart_data': chart_data,
-        'time_period': time_period,
+        'smallest_grading': smallest_grading,
     }
 
     return render(request, 'currency/currency_detail.html', context=context)

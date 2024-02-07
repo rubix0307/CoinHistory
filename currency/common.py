@@ -18,9 +18,9 @@ class CandleData:
         type_hints = get_type_hints(CandleData)
         return {k: type_hints[k](v) for k, v in asdict(self).items() if v}
 
-def get_candles_chart_data(*, time_period: int, currency_id: int) -> list[CandleData]:
+def get_candles_chart_data(*, smallest_grading: int, currency_id: int) -> list[CandleData]:
     """
-    :param time_period: int Value of period for candles assembly (in seconds)
+    :param smallest_grading: int Value of period for candles assembly (in seconds)
     :param currency_id: id models.Currency
     :return: list[CandleData]
     """
@@ -31,7 +31,7 @@ def get_candles_chart_data(*, time_period: int, currency_id: int) -> list[Candle
         WITH RECURSIVE TimeSeries (time) AS (
             SELECT (SELECT MIN(time) FROM {db_table} WHERE currency_id = {currency_id}) -- start
             UNION ALL
-            SELECT time + {time_period} -- step
+            SELECT time + {smallest_grading} -- step
             FROM TimeSeries
             WHERE time < (SELECT MAX(time) FROM {db_table} WHERE currency_id = {currency_id})  -- end
         )
@@ -44,11 +44,11 @@ def get_candles_chart_data(*, time_period: int, currency_id: int) -> list[Candle
               MIN(price) AS low,
               SUBSTRING_INDEX(MAX(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS close,
               SUBSTRING_INDEX(MAX(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS value
-        FROM (SELECT *, FLOOR(time/{time_period}) AS n FROM {db_table} WHERE currency_id = {currency_id}
+        FROM (SELECT *, FLOOR(time/{smallest_grading}) AS n FROM {db_table} WHERE currency_id = {currency_id}
               UNION
-              SELECT *, FLOOR(time/{time_period})-1 AS n FROM {db_table} WHERE currency_id = {currency_id} AND !(time%{time_period})
+              SELECT *, FLOOR(time/{smallest_grading})-1 AS n FROM {db_table} WHERE currency_id = {currency_id} AND !(time%{smallest_grading})
               UNION
-              SELECT null as id, ts.time as time, null as price, {currency_id} as currency_id, FLOOR(time/{time_period}) AS n FROM TimeSeries AS ts
+              SELECT null as id, ts.time as time, null as price, {currency_id} as currency_id, FLOOR(time/{smallest_grading}) AS n FROM TimeSeries AS ts
              ) AS union_table
         GROUP BY n
     """

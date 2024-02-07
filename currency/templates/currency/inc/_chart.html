@@ -6,13 +6,13 @@
         <div class="header">
             <div class="periods">
                 {% with time_period=time_period|default:'900'|stringformat:"s" %}
-                    <a {% if time_period == '900' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=900">15m</a>
-                    <a {% if time_period == '1800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=1800">30m</a>
-                    <a {% if time_period == '3600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=3600">1H</a>
-                    <a {% if time_period == '21600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=21600">6H</a>
-                    <a {% if time_period == '43200' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=43200">12H</a>
-                    <a {% if time_period == '86400' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=86400">1D</a>
-                    <a {% if time_period == '172800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?time_period=172800">2D</a>
+                    <a {% if time_period == '900' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=900">15m</a>
+                    <a {% if time_period == '1800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=1800">30m</a>
+                    <a {% if time_period == '3600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=3600">1H</a>
+                    <a {% if time_period == '21600' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=21600">6H</a>
+                    <a {% if time_period == '43200' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=43200">12H</a>
+                    <a {% if time_period == '86400' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=86400">1D</a>
+                    <a {% if time_period == '172800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=172800">2D</a>
 
                     <div class="items">
                         <div id="line-toggle" class="item active">Line</div>
