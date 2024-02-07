@@ -265,3 +265,13 @@ main aside h1 .symbol{
     margin: 0;
     color: #616E85;
 }
+.feed {
+    width: min-content;
+}
+.about {
+    font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
+    color: #58667e;
+}
+footer {
+    margin-top: 150px;
+}
