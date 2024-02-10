@@ -221,6 +221,24 @@ class CMCScraper:
         return data
 
     def update_currencies_data(self, currencies: list[Currency]) -> list[Currency]:
+        url_fields = ['currency', 'url', 'type']
+        all_urls = [dict(zip(url_fields, i)) for i in URL.objects.filter(currency__in=currencies).values_list(*url_fields).all()]
+
+        tag_fields = ['currency', 'name', 'slug', 'category']
+        all_tags = [dict(zip(tag_fields, i))for i in Tag.objects.filter(currency__in=currencies).values_list(*tag_fields).all()]
+
+        platform_fields = ['currency','platform_crypto_id','contract_id','contract_address','contract_platform','contract_platform_id','contract_chain_id','contract_native_currency_name','contract_native_currency_symbol','contract_native_currency_decimals','contract_block_explorer_url','contract_explorer_url','contract_decimals','sort',]
+        all_platforms = [dict(zip(platform_fields, platform_data))
+                         for platform_data in Platform.objects.filter(currency__in=currencies).values_list(*platform_fields).all()]
+
+        audit_fields = ['currency','auditor','audit_status','audit_time','report_url',]
+        all_audits = [dict(zip(audit_fields, i)) for i in Audit.objects.filter(currency__in=currencies).values_list(*audit_fields).all()]
+
+        new_urls = []
+        new_tags = []
+        new_platforms = []
+        new_audits = []
+
 
         for around_num, currency in enumerate(currencies):
 
@@ -253,7 +271,6 @@ class CMCScraper:
                 currency.launch_price = data_detail['launchPrice']
                 currency.date_launched = int(datetime.fromisoformat(data_detail['dateLaunched'].replace('Z', '+00:00')).timestamp()) if data_detail['dateLaunched'] else None # TODO
                 currency.date_updated = int(timezone.now().timestamp())
-                currency.save()
 
             except Exception as ex:
                 print()
@@ -264,30 +281,37 @@ class CMCScraper:
                     for k, v in data_detail['urls'].items() if v
                     for i in v]
 
-                for url in urls:
-                    URL.objects.update_or_create(currency=currency, **url)
+                for url_data in urls:
+                    check_data_url = dict(currency=currency.id, **url_data)
+                    if not check_data_url in all_urls:
+                        all_urls.append(check_data_url)
+                        new_urls.append(URL(currency=currency, **url_data))
             except Exception as ex:
                 print()
 
             try:
-                for tag in data_detail['tags']:
-                    Tag.objects.update_or_create(currency=currency, **tag)
+                reported_tags = [{'name': t, 'category': 'selfReportedTags', 'slug': None} for t in data_detail['selfReportedTags']]
+                for tag_data in data_detail['tags'] + reported_tags:
+                    check_data_tag = dict(currency=currency.id, **tag_data)
+                    if not check_data_tag in all_tags:
+                        all_tags.append(check_data_tag)
+                        new_tags.append(Tag(currency=currency, **tag_data))
             except Exception as ex:
                 print()
 
 
             try:
                 platform_fields = [f.name for f in Platform._meta.get_fields()]
-                platforms = [{camel_to_snake(k):v
+                platforms_data = [{camel_to_snake(k):v
                               for k,v in platform.items()
                               if camel_to_snake(k) in platform_fields}
                              for platform in data_detail['platforms']]
-            except Exception as ex:
-                print()
 
-            try:
-                for platform in platforms:
-                    Platform.objects.update_or_create(currency=currency, **platform)
+                for platform_data in platforms_data:
+                    check_data_platform = dict(currency=currency.id, **platform_data)
+                    if not check_data_platform in all_platforms:
+                        all_platforms.append(check_data_platform)
+                        new_platforms.append(Platform(currency=currency, **platform_data))
             except Exception as ex:
                 print()
 
@@ -295,8 +319,15 @@ class CMCScraper:
             try:
                 for audit_info in data_detail.get('auditInfos',[]):
                     audit_time = audit_info.get('auditTime')
+
+                    if not audit_time:
+                        continue
+
                     if 'T' in audit_time:
-                        audit_time = int(datetime.strptime(audit_time, '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())
+                        try:
+                            audit_time = int(datetime.strptime(audit_time, '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())
+                        except ValueError:
+                            audit_time = int(datetime.strptime(audit_time, '%Y-%m-%dT%H:%M:%SZ').timestamp())
                     else:
                         audit_time = int(datetime.strptime(audit_time, '%Y-%m-%d').timestamp())
 
@@ -306,17 +337,26 @@ class CMCScraper:
                         'audit_time':  audit_time,
                         'report_url':  audit_info.get('reportUrl'),
                     }
-
-                    score = audit_info.get('score')
-                    if score and score != 'N/A':
-                        audit_data.update({'score': score})
-
-                    Audit.objects.update_or_create(currency=currency, **audit_data)
+                    check_data_audit = dict(currency=currency.id, **audit_data)
+                    if not check_data_audit in all_audits:
+                        all_audits.append(check_data_audit)
+                        new_audits.append(Audit(currency=currency, **audit_data))
 
             except Exception as ex:
                 print()
 
-            pairs = self.get_market_pairs(currency=currency, limit=100)
+            pairs = self.get_market_pairs(currency=currency, limit=500)
             chart_data = self.get_chart_data(currency=currency, chart_range=ChartRange.day)
 
+        currency_fields = [f.name for f in Currency._meta.get_fields() if not f.name in ['id'] and not f.one_to_many]
+        Currency.objects.bulk_update(currencies, fields=currency_fields)
+        URL.objects.bulk_create(new_urls)
+        Tag.objects.bulk_create(new_tags)
+        Platform.objects.bulk_create(new_platforms)
+        Audit.objects.bulk_create(new_audits)
+
         return currencies
+
+if __name__ == '__main__':
+    currencies = CMCScraper().get_listings_new()
+
