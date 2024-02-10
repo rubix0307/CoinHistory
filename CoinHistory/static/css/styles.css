@@ -43,6 +43,11 @@ header {
     top: 0;
     background-color: white;
 }
+.-scrollbar::-webkit-scrollbar {
+    width:0;
+    height:0
+}
+
 .the-table-place {
     border-radius: 14px;
     border: 2px #f1f1f1 solid;
