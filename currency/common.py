@@ -2,7 +2,7 @@ from dataclasses import dataclass, asdict
 from typing import get_type_hints
 from django.db import connections
 from .models import Price
-from common.edit_text import camel_to_snake
+
 
 @dataclass
 class CandleData:
