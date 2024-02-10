@@ -13,6 +13,7 @@
                     <a {% if smallest_grading == '43200' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=43200">12H</a>
                     <a {% if smallest_grading == '86400' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=86400">1D</a>
                     <a {% if smallest_grading == '172800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=172800">2D</a>
+                    <a {% if smallest_grading == '604800' %}class="active"{% endif %} href="{% url 'currency_detail' slug=currency.slug %}?smallest_grading=604800">7D</a>
 
                     <div class="items">
                         <div id="line-toggle" class="item active">Line</div>
