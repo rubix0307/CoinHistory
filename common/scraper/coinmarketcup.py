@@ -8,12 +8,13 @@ from datetime import timedelta, datetime
 from dataclasses import dataclass
 
 import django
+from django.db.utils import DataError
 import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
 from requests.exceptions import HTTPError
 
-from common.edit_text import camel_to_snake
+from common.common import camel_to_snake, chunk_list
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CoinHistory.settings')
 django.setup()
@@ -137,16 +138,15 @@ class CMCScraper:
 
         return currencies
 
-    def get_market_pairs(self, *, currency: Currency, start: int = 1, limit: int = 10) -> list[Pair] | list:
+    def get_market_pairs(self, *, currency: Currency, start: int = 1) -> list[Pair] | list:
         """
         :param currency: Currency class object
         :param start: Show pairs starting from the specified number
-        :param limit: max pairs count
         :return: list[MarketPair] | []
         """
 
         url = "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/market-pairs/latest"
-
+        limit = 500
         params = {
             'slug': currency.slug,
             'start': start,
@@ -157,28 +157,35 @@ class CMCScraper:
             'direction': 'desc',
             'spotUntracked': 'true',
         }
-
+        pairs = []
+        market_pairs_data = True # only for while start
         try:
-            response = requests.get(url, headers=self.headers, params=params)
-            response.raise_for_status()
-            data = json.loads(response.text)
+            while market_pairs_data is True or (market_pairs_data and len(market_pairs_data) == limit):
+                response = requests.get(url, headers=self.headers, params=params)
+                response.raise_for_status()
+                data = json.loads(response.text)
 
-            pairs_data = [{camel_to_snake(k): v for k, v in pair.items() if not k == 'quotes'} for pair in
-                    data.get('data', {}).get('marketPairs', {}) if pair.get('isVerified')]
+                market_pairs_data = data.get('data', {}).get('marketPairs', {})
+                pairs_data = [{camel_to_snake(k): v for k, v in pair.items() if not k == 'quotes'}
+                              for pair in market_pairs_data
+                              if pair.get('isVerified')]
 
-            pairs = []
-            for p_data in pairs_data:
-                p_data.update({'date_updated': int(datetime.strptime(p_data['last_updated'], '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())})
-                del p_data['last_updated']
-                pairs.append(Pair(currency=currency, **p_data))
+                for p_data in pairs_data:
+                    p_data.update({'date_updated': int(datetime.strptime(p_data['last_updated'], '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())})
+                    del p_data['last_updated']
+                    pairs.append(Pair(currency=currency, **p_data))
 
+                start += limit
+                params.update({'start': start})
+
+        finally:
             Pair.objects.bulk_create(pairs, ignore_conflicts=True)
-            Pair.objects.bulk_update(pairs, fields=[f.name for f in Pair._meta.get_fields() if not f.name in ['market_id', 'currency']])
+
+            pair_fields = [f.name for f in Pair._meta.get_fields() if not f.name in ['market_id', 'currency']]
+            for chunk_pairs in chunk_list(pairs, 500): # data too long
+                Pair.objects.bulk_update(chunk_pairs, fields=pair_fields)
 
             return pairs
-
-        except HTTPError as ex:
-            return []
 
     def get_chart_data(self, currency: Currency, chart_range: ChartRange=ChartRange.all, is_save=True) -> list[ChartData]:
         # TODO exceptions
@@ -345,7 +352,7 @@ class CMCScraper:
             except Exception as ex:
                 print()
 
-            pairs = self.get_market_pairs(currency=currency, limit=500)
+            pairs = self.get_market_pairs(currency=currency)
             chart_data = self.get_chart_data(currency=currency, chart_range=ChartRange.day)
 
         currency_fields = [f.name for f in Currency._meta.get_fields() if not f.name in ['id'] and not f.one_to_many]

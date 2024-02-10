@@ -17,7 +17,7 @@ class Pair(models.Model):
     depth_usd_positive_two = models.FloatField(null=True)
     exchange_id = models.IntegerField()
     exchange_name = models.CharField(max_length=255)
-    exchange_notice = models.CharField(max_length=255)
+    exchange_notice = models.TextField()
     exchange_slug = models.CharField(max_length=255)
     fee_type = models.CharField(max_length=255)
     index_price = models.IntegerField()
