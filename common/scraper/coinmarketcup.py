@@ -80,45 +80,62 @@ class CMCScraper:
         else:
             self.headers = headers
 
-    def get_listings_new(self, check_only_new=False) -> list[Currency] | list:
-        listings_new = []
-        listings_exists = []
+
+    def get_listings_new(self, is_all_pages=False, get_all_chart_data=False) -> list[Currency] | list:
+        """
+        :param is_all_pages: bool; If False - check only first 500
+        :param get_all_chart_data: query chart data for each currency
+        :return: list with or without Currency
+        """
+        added_list = []
+        currencies = []
         all_slugs = Currency.objects.all().values_list('slug', flat=True)
+        url = 'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/spotlight'
 
-        url = 'https://coinmarketcap.com/new/'
-        for num_page in range(1,2): # TODO next pages
-            response = requests.get(url=url, headers=self.headers, params={'page': num_page})
+        start_num = 1
+        limit = 500
+        params = {
+            'dataType': 8,
+            'limit': limit,
+            'start': start_num,
+        }
 
-            try:
-                response.raise_for_status()
-            except HTTPError as ex:
-                return []
+        recently_added_list = True # True only for while start
+        while recently_added_list:
 
-            soup = BeautifulSoup(response.text, 'html.parser')
-            rows = soup.find('tbody').find_all('tr')
+            response = requests.get(url=url, headers=self.headers, params=params)
+            data = json.loads(response.text)
 
-            for row in rows:
+            recently_added_list = data.get('data',{}).get('recentlyAddedList',[])
+            added_list += recently_added_list
 
-                row_tds = row.find_all('td')
-                slug = row_tds[2].find('a').attrs.get('href').split('/')[2]
+            start_num += limit
+            params.update({'start': start_num})
 
-                if check_only_new and slug in all_slugs:
-                    continue
+            if not is_all_pages:
+                break
 
-                new_currency = Currency(
-                    slug=slug,
-                    coinmarketcap_url=f'https://coinmarketcap.com/currencies/{slug}',
-                )
+        for round_num, currency_data in enumerate(added_list):
+            slug = currency_data.get('slug')
+            if not slug or slug in all_slugs:
+                continue
 
-                if slug in all_slugs:
-                    new_currency.date_updated=timezone.now().timestamp()
-                    listings_exists.append(new_currency)
-                else:
-                    new_currency.date_added=convert_to_datetime(row_tds[9].text).timestamp()
-                    listings_new.append(new_currency)
+            currency = Currency(
+                id=currency_data['id'],
+                name=currency_data['name'],
+                slug=slug,
+                coinmarketcap_url=f'https://coinmarketcap.com/currencies/{slug}/',
+                date_added=int(datetime.strptime(currency_data['addedDate'], '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())
+            )
+            currencies.append(currency)
 
-        return listings_exists + listings_new
+        Currency.objects.bulk_create(currencies)
 
+        if get_all_chart_data:
+            for num, currency in enumerate(currencies):
+                self.get_chart_data(currency=currency, chart_range=ChartRange.all)
+
+        return currencies
 
     def get_market_pairs(self, *, currency: Currency, start: int = 1, limit: int = 10) -> list[Pair] | list:
         """
