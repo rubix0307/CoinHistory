@@ -7,7 +7,7 @@ from .models import Currency
 
 def index(request: WSGIRequest):
     context = {
-        'currencies': Currency.objects.order_by('-date_added').all()[:1000]
+        'currencies': Currency.objects.order_by('-date_updated').all()[:1000]
     }
     return render(request, 'currency/index.html', context=context)
 
