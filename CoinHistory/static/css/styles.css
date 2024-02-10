@@ -1,4 +1,6 @@
-
+* {
+    scroll-behavior: smooth;
+}
 body {
     padding: 0;
     margin: 0;
@@ -9,7 +11,9 @@ body {
 h1,h2,h3,h4,h5,h6 {
     text-align: center;
     color: #0D1422;
+    margin:auto auto;
 }
+
 
 header {
     display: flex;
@@ -34,66 +38,82 @@ header {
         border: 1px #000000 solid;
     }
 }
-.currency-dashboard-place {
-    background-color: #f1f1f1;
-    margin: 10px auto;
+.the-table-place thead {
+    position: sticky;
+    top: 0;
+    background-color: white;
+}
+.the-table-place {
+    border-radius: 14px;
+    border: 2px #f1f1f1 solid;
+    /* width: 100%; */
+    max-height: 500px;
     overflow-y: scroll;
-    max-width: max-content;
-    font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
+    /* padding-bottom: 20px; */
+    margin-top: 20px;
+    overflow-x: scroll;
 
-
-    .logo {
-        border-radius: 100%;
-        max-width: 30px;
-        align-items: center;
-        margin: 0 10px 0 0;
+    .the-table {
+    width: 100%;
+    padding: 0;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    overflow-x: scroll;
     }
-    .currency-dashboard {
-        border-collapse: separate;
-        border-spacing: 0;
-
-    }
-
-    .currency-dashboard tbody tr th,
-    .currency-dashboard tbody tr th.left{
-       border-right: 1px transparent solid;
-
-    }
-    .currency-dashboard tbody tr:hover,
-    .currency-dashboard tbody tr:hover th.left{
-       background-color: #bbd5dc;
-    }
-    .currency-dashboard tbody tr:hover th,
-    .currency-dashboard tbody tr:hover th.left{
-       border-right: 1px #88a5ac solid;
-    }
-
-
-    .currency-dashboard tr th {
-        padding: 5px 8px;
-        border-bottom: 1px #0000003d solid;
-        text-decoration: none;
-        font-weight:normal;
-        .caption {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-
-            .symbol {
-                padding: 0 5px;
-                color: gray;
-            }
-        }
-    }
-    .currency-dashboard tbody tr:last-child th {
-        border-bottom: 1px transparent solid;
-    }
-    .currency-dashboard tr th.left {
-        background-color: #dddddd;
-        left: 0;
+    .the-table
+    th.left {
         position: sticky;
-        font-weight: bold;
-        padding: 5px 5px;
+    left: 0;
+    background-color: white;
+    }
+    .the-table
+    tbody tr{
+        margin-bottom: 20px;
+    }
+    .the-table
+    tbody tr th{
+        border-top: 2px transparent solid;
+    border-bottom: 2px transparent solid;
+    border-right: 2px transparent solid;
+    }
+    .the-table
+    tbody tr:hover th{
+        border-top: 2px #d7d7d7 solid;
+    border-bottom: 2px #d7d7d7 solid;
+    border-right: 2px #d7d7d7 solid;
+    }
+    .the-table
+    tbody tr:hover th:last-child{
+        border-right: 2px transparent solid;
+    }
+    .the-table
+    thead {
+        width: 100%;
+    z-index: 100;
+    }
+    .the-table
+    thead tr{
+        border: 5px #f1f1f1 solid;
+
+
+    }
+    .the-table
+    thead tr th{
+        padding: 5px 0 5px 0;
+    border-bottom: 1px #f1f1f1 solid;
+    }
+    .the-table
+    thead tr th:first-child{
+        border-radius: 12px 0 0 0;
+    }
+    .the-table
+    thead tr th:last-child{
+        border-radius: 0 12px 0 0;
+    }
+
+    .caption
+    img{
+        max-height: 30px;
     }
 }
 
@@ -148,6 +168,7 @@ form.auth input[type="submit"]{
     padding: 6px;
     width: 980px;
     margin: 0 auto;
+    margin-top: 20px;
 
     .header {
         display: flex;
@@ -207,7 +228,7 @@ main {
     justify-content: center;
 }
 main aside {
-    margin-right: 40px;
+    margin-right: 20px;
     max-width: 400px;
 
     .list {
@@ -215,8 +236,9 @@ main aside {
         width: 100%;
         border: 2px #f1f1f1 solid;
         border-radius: 10px;
-        margin-bottom: 5px;
-        padding: 2px 2px 10px 2px;
+        margin: 20px 0 5px 0;
+        padding: 2px 0px 10px 0px;
+
 
     }
     .list ul {
@@ -252,6 +274,9 @@ main aside {
 main aside h1{
     display: flex;
     flex-direction: column;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    width: min-content;
 }
 main aside h1 a{
     text-decoration: none;
@@ -268,6 +293,8 @@ main aside h1 .symbol{
 }
 .feed {
     width: min-content;
+    scroll-behavior: smooth;
+    max-width: 100%;
 }
 .about {
     font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
@@ -277,6 +304,18 @@ main aside h1 .symbol{
     box-sizing: border-box;
     border-spacing: 0;
     pointer-events: auto;
+    border-radius: 14px;
+    border: 2px #f1f1f1 solid;
+    width: 100%;
+    max-height: 500px;
+    overflow-y: scroll;
+    margin-top: 20px;
+    padding: 0 10px 20px 10px;
+}
+.about h3 {
+    position: sticky;
+    top: 0;
+    background-color: white;
 }
 footer {
     margin-top: 150px;
@@ -298,3 +337,38 @@ footer {
         }
     }
 }
+
+nav.currency_detail {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+nav.currency_detail a{
+    background-color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    text-decoration: none;
+    padding: 4px 5px;
+    margin: 0 1px;
+    border-radius: 2px;
+    border: 2px #f1f1f1 solid;
+    color: #676767;
+    transition: 0.2s;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+nav.currency_detail a:first-child {
+    border-radius: 14px 2px 2px 14px;
+    margin: 0 1px 0 0;
+}
+nav.currency_detail a:last-child {
+    border-radius: 2px 14px 14px 2px;
+    margin: 0 0 0 1px;
+}
+nav.currency_detail a:only-child {
+    border-radius: 14px;
+}
+

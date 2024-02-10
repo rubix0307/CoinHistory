@@ -1,19 +1,20 @@
 {% load mathfilters %}
-<div class="market">
+<div id="market" class="market">
+
     <h2>{{ currency.name }} Markets</h2>
-    <div class="currency-dashboard-place">
-        <table class="currency-dashboard">
+    <div class="the-table-place">
+        <table class="the-table">
             <thead>
                 <tr>
                     <th class="left">#</th>
                     <th class="left">Exchange</th>
-                    <th class="left">Pair</th>
-                    <th class="left">Price</th>
-                    <th class="left">Volume (24h)</th>
-                    <th class="left">Volume %</th>
-                    <th class="left">Liquidity Score</th>
-                    <th class="left">Last updated</th>
-                    <th class="left">Date added</th>
+                    <th>Pair</th>
+                    <th>Price</th>
+                    <th>Volume (24h)</th>
+                    <th>Volume %</th>
+                    <th>Liquidity Score</th>
+                    <th>Last updated</th>
+                    <th>Date added</th>
                 </tr>
             </thead>
             <tbody>
