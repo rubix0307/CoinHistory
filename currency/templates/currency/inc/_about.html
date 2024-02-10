@@ -1,4 +1,7 @@
+{% load clear_text %}
 <div id="about" class="about -scrollbar">
     <h3>About {{ currency.name }}</h3>
-    <div class="description">{{ currency.description|default:''|linebreaksbr }}</div>
+    {% autoescape off %}
+        <div class="description">{{ currency.description|default:''|markdown_a_to_html|save_html_tags:'a'|linebreaksbr|safe }}</div>
+    {% endautoescape %}
 </div>
