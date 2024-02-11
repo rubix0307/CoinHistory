@@ -1,17 +1,18 @@
 * {
     scroll-behavior: smooth;
 }
+
 body {
     padding: 0;
     margin: 0;
     /*min-height: 3000px;*/
-    font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, segoe ui, Roboto, Helvetica, Arial, sans-serif;
 }
 
-h1,h2,h3,h4,h5,h6 {
+h1, h2, h3, h4, h5, h6 {
     text-align: center;
     color: #0D1422;
-    margin:auto auto;
+    margin: auto auto;
 }
 
 
@@ -25,27 +26,31 @@ header {
     width: 100%;
     border-bottom: 1px #000000 solid;
 
-    .auth{
+    .auth {
         padding: 0 10px;
     }
+
     .auth a {
         text-decoration: none;
         padding: 5px 10px;
         border-radius: 10px;
         border: 1px transparent solid;
     }
+
     .auth a:hover {
         border: 1px #000000 solid;
     }
 }
+
 .the-table-place thead {
     position: sticky;
     top: 0;
     background-color: white;
 }
+
 .-scrollbar::-webkit-scrollbar {
-    width:0;
-    height:0
+    width: 0;
+    height: 0
 }
 
 .the-table-place {
@@ -59,65 +64,64 @@ header {
     overflow-x: scroll;
 
     .the-table {
-    width: 100%;
-    padding: 0;
-    border-collapse: separate;
-    border-spacing: 0 10px;
-    overflow-x: scroll;
+        width: 100%;
+        padding: 0;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+        overflow-x: scroll;
     }
-    .the-table
-    th.left {
+
+    .the-table th.left {
         position: sticky;
-    left: 0;
-    background-color: white;
+        left: 0;
+        background-color: white;
     }
-    .the-table
-    tbody tr{
+
+    .the-table tbody tr {
         margin-bottom: 20px;
     }
-    .the-table
-    tbody tr th{
+
+    .the-table tbody tr th {
         border-top: 2px transparent solid;
-    border-bottom: 2px transparent solid;
-    border-right: 2px transparent solid;
-    }
-    .the-table
-    tbody tr:hover th{
-        border-top: 2px #d7d7d7 solid;
-    border-bottom: 2px #d7d7d7 solid;
-    border-right: 2px #d7d7d7 solid;
-    }
-    .the-table
-    tbody tr:hover th:last-child{
+        border-bottom: 2px transparent solid;
         border-right: 2px transparent solid;
     }
-    .the-table
-    thead {
-        width: 100%;
-    z-index: 100;
+
+    .the-table tbody tr:hover th {
+        border-top: 2px #d7d7d7 solid;
+        border-bottom: 2px #d7d7d7 solid;
+        border-right: 2px #d7d7d7 solid;
     }
-    .the-table
-    thead tr{
+
+    .the-table tbody tr:hover th:last-child {
+        border-right: 2px transparent solid;
+    }
+
+    .the-table thead {
+        width: 100%;
+        z-index: 100;
+    }
+
+    .the-table thead tr {
         border: 5px #f1f1f1 solid;
 
 
     }
-    .the-table
-    thead tr th{
+
+    .the-table thead tr th {
         padding: 5px 0 5px 0;
-    border-bottom: 1px #f1f1f1 solid;
+        border-bottom: 1px #f1f1f1 solid;
     }
-    .the-table
-    thead tr th:first-child{
+
+    .the-table thead tr th:first-child {
         border-radius: 12px 0 0 0;
     }
-    .the-table
-    thead tr th:last-child{
+
+    .the-table thead tr th:last-child {
         border-radius: 0 12px 0 0;
     }
 
-    .caption
-    img{
+    .caption img {
         max-height: 30px;
     }
 }
@@ -127,6 +131,7 @@ form.auth {
     max-width: min(100%, 350px);
     margin: 0 auto;
 }
+
 form.auth p {
     display: flex;
     flex-direction: column;
@@ -134,22 +139,27 @@ form.auth p {
     .helptext {
         margin: 10px 0;
     }
+
     .helptext:empty {
         margin: 0;
     }
 }
+
 form.auth label {
     font-size: 20px;
     font-weight: bold;
 }
+
 form.auth ul {
     margin: 0;
     padding: 0 0 0 25px;
 }
-form.auth ul li{
+
+form.auth ul li {
     margin: 5px 0;
 }
-form.auth input[type="submit"]{
+
+form.auth input[type="submit"] {
     width: 100%;
     padding: 5px;
 }
@@ -162,6 +172,7 @@ form.auth input[type="submit"]{
     flex-direction: column;
     align-items: center;
 }
+
 .tags ul {
     padding: 0 0 0 25px;
     margin: 0;
@@ -171,7 +182,8 @@ form.auth input[type="submit"]{
     border-radius: 14px;
     border: 2px #f1f1f1 solid;
     padding: 6px;
-    width: 980px;
+    width: calc(90vw);
+    max-width: 100%;
     margin: 0 auto;
     margin-top: 20px;
 
@@ -180,13 +192,15 @@ form.auth input[type="submit"]{
 
         .periods {
             display: flex;
+            flex-wrap: wrap;
             flex-direction: row;
             border-radius: 7px;
             /*background-color: #f1f1f1;*/
             padding: 3px 1px;
         }
+
         .periods a,
-        .periods .item{
+        .periods .item {
             text-decoration: none;
             padding: 2px;
             margin: 0 2px;
@@ -199,39 +213,47 @@ form.auth input[type="submit"]{
             -ms-user-select: none; /* IE10+/Edge */
             user-select: none; /* Standard */
         }
+
         .periods .items {
             display: flex;
             flex-direction: row;
-            margin-left: 30px;
+            /* margin-left: 30px; */
+            flex-wrap: wrap;
         }
 
         .periods a.active,
-        .periods .item.active{
+        .periods .item.active {
             border-color: #888;
             color: #4a4a4a;
-            font-weight:bold;
+            font-weight: bold;
         }
+
         .periods a:hover {
             border-color: #000000;
             color: #000000;
         }
+
         .periods .item.active {
             border-color: #ffa500;
             color: #ffa500;
         }
+
         .periods .item:hover {
             color: #ffa500;
         }
+
         .periods .item.active:hover {
             color: black;
         }
     }
 }
+
 main {
     display: flex;
     flex-direction: row;
     justify-content: center;
 }
+
 main aside {
     margin-right: 20px;
     max-width: 400px;
@@ -242,10 +264,9 @@ main aside {
         border: 2px #f1f1f1 solid;
         border-radius: 10px;
         margin: 20px 0 5px 0;
-        padding: 2px 0px 10px 0px;
-
-
+        padding: 2px 0 10px 0;
     }
+
     .list ul {
         padding: 0 0 0 8px;
         display: flex;
@@ -255,19 +276,23 @@ main aside {
         flex-direction: column;
         margin: 0;
     }
-    .list ul li{
+
+    .list ul li {
         text-transform: capitalize;
         list-style: none;
     }
-    .list ul li a{
+
+    .list ul li a {
         color: black;
         text-decoration: none;
     }
-    .list ul li a.faviconLink{
+
+    .list ul li a.faviconLink {
         display: flex;
         flex-direction: row;
     }
-    .list ul li a.faviconLink .favicon{
+
+    .list ul li a.faviconLink .favicon {
         background-size: cover;
         width: 20px;
         height: auto;
@@ -276,33 +301,39 @@ main aside {
     }
 
 }
-main aside h1{
+
+main aside h1 {
     display: flex;
     flex-direction: column;
     overflow-wrap: break-word;
     word-wrap: break-word;
     width: min-content;
 }
-main aside h1 a{
+
+main aside h1 a {
     text-decoration: none;
     padding: 0;
     margin: 0;
     color: #0D1422;
 
 }
-main aside h1 .symbol{
+
+main aside h1 .symbol {
     font-size: 16px;
     padding: 0;
     margin: 0;
     color: #616E85;
 }
+
 .feed {
     width: min-content;
     scroll-behavior: smooth;
-    max-width: 100%;
+    /*max-width: 100%;*/
+    max-width: 900px;
 }
+
 .about {
-    font-family: Inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, segoe ui, Roboto, Helvetica, Arial, sans-serif;
     color: #58667e;
     word-break: break-word;
     line-height: 150%;
@@ -317,11 +348,13 @@ main aside h1 .symbol{
     margin-top: 20px;
     padding: 0 10px 20px 10px;
 }
+
 .about h3 {
     position: sticky;
     top: 0;
     background-color: white;
 }
+
 footer {
     margin-top: 150px;
 }
@@ -349,7 +382,8 @@ nav.currency_detail {
     top: 0;
     z-index: 100;
 }
-nav.currency_detail a{
+
+nav.currency_detail a {
     background-color: white;
     text-decoration: none;
     margin-right: 20px;
@@ -365,15 +399,22 @@ nav.currency_detail a{
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
 }
+
 nav.currency_detail a:first-child {
     border-radius: 14px 2px 2px 14px;
     margin: 0 1px 0 0;
 }
+
 nav.currency_detail a:last-child {
     border-radius: 2px 14px 14px 2px;
     margin: 0 0 0 1px;
 }
+
 nav.currency_detail a:only-child {
     border-radius: 14px;
 }
 
+
+.market {
+    max-width: calc(95vw);
+}

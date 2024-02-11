@@ -25,4 +25,4 @@ def register(request):
         'title': 'Register',
     }
 
-    return render(request, 'registration/login.html', context=context)
+    return render(request, 'registration/register.html', context=context)
