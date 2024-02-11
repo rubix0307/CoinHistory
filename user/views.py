@@ -1,14 +1,15 @@
 from django.core.handlers.wsgi import WSGIRequest
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
+
+from .forms import UserRegisterForm
+
 
 @login_required
 def profile(request: WSGIRequest):
     return render(request, 'user/profile.html')
 
-from django.shortcuts import render, redirect
-from .forms import UserRegisterForm
-from django.contrib.auth import login
 
 def register(request):
     if request.method == 'POST':
@@ -16,6 +17,11 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+
+            next_page = request.GET.get('next')
+            if next_page:
+                return redirect(next_page)
+
             return redirect('profile')
     else:
         form = UserRegisterForm()
