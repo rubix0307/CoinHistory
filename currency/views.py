@@ -1,17 +1,18 @@
 from django.core.handlers.wsgi import WSGIRequest
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from .common import get_candles_chart_data
 from .models import Currency
 
-
+@login_required
 def index(request: WSGIRequest):
     context = {
-        'currencies': Currency.objects.order_by('-date_updated').all()[:1000]
+        'currencies': Currency.objects.order_by('-id').all()[:100]
     }
     return render(request, 'currency/index.html', context=context)
 
-
+@login_required
 def currency_detail(request: WSGIRequest, slug: str):
     currency = (Currency.objects
                 .filter(slug=slug)

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+
+from django.urls import reverse_lazy
 from dotenv import load_dotenv
 
 load_dotenv('.env')
@@ -141,3 +143,4 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'CoinHistory', 'static'),]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'profile'
+LOGIN_URL = reverse_lazy('login')

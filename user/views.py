@@ -26,3 +26,7 @@ def register(request):
     }
 
     return render(request, 'registration/register.html', context=context)
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')

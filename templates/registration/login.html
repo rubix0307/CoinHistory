@@ -9,6 +9,6 @@
             {{ form.as_p }}
             <input type="submit" value="Submit">
         </form>
-        <a href="{% url 'register' %}">You don't have an account?</a>
+        <a href="{% url 'register' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">You don't have an account?</a>
     </div>
 {% endblock %}
