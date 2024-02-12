@@ -1,20 +1,19 @@
 import time
-from django.db import models
+from django.db import models, connections
 from django.utils import timezone
 
 class Pair(models.Model):
+
     currency = models.ForeignKey('Currency', on_delete=models.CASCADE, related_name='pair')
-    market_id = models.IntegerField(primary_key=True)
-    market_pair = models.CharField(max_length=255)
-    market_reputation = models.IntegerField()
-    market_score = models.CharField(max_length=255)
-    market_url = models.CharField(max_length=255)
+
+    market_id = models.IntegerField()
     base_currency_id = models.IntegerField()
     base_symbol = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
     center_type = models.CharField(max_length=255)
     depth_usd_negative_two = models.FloatField(null=True)
     depth_usd_positive_two = models.FloatField(null=True)
+    effective_liquidity = models.FloatField(null=True)
     exchange_id = models.IntegerField()
     exchange_name = models.CharField(max_length=255)
     exchange_notice = models.TextField()
@@ -22,6 +21,10 @@ class Pair(models.Model):
     fee_type = models.CharField(max_length=255)
     index_price = models.IntegerField()
     is_verified = models.BooleanField()
+    market_pair = models.CharField(max_length=255)
+    market_reputation = models.FloatField()  # for confidence
+    market_score = models.CharField(max_length=255)
+    market_url = models.CharField(max_length=255)
     outlier_detected = models.IntegerField()
     por_audit_status = models.IntegerField()
     price = models.FloatField(null=True)
@@ -38,12 +41,13 @@ class Pair(models.Model):
     volume_quote = models.FloatField(null=True)
     volume_usd = models.FloatField(null=True)
 
-    effective_liquidity = models.FloatField(null=True)
+    dexer_url = models.URLField(null=True, max_length=1000)
+    liquidity = models.FloatField(null=True)
+    pair_contract_address = models.CharField(null=True, max_length=255)
     platform_id = models.IntegerField(null=True)
     platform_name = models.CharField(null=True, max_length=255)
-    pair_contract_address = models.CharField(null=True, max_length=255)
-    liquidity = models.FloatField(null=True)
-    dexer_url = models.URLField(null=True, max_length=1000)
+
+    last_updated = models.BigIntegerField() # time from coinmarketcap's response
 
     date_updated = models.BigIntegerField(default=int(timezone.now().timestamp()))
     date_added = models.BigIntegerField(default=int(timezone.now().timestamp()))
