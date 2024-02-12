@@ -127,6 +127,21 @@ class Currency(models.Model):
     date_updated = models.BigIntegerField(default=int(timezone.now().timestamp()))
     date_added = models.BigIntegerField(default=int(timezone.now().timestamp()))
 
+    def get_latest_pair(self) -> list | list[Pair]:
+        raw_sql = f'''
+        SELECT cp1.* FROM {Pair._meta.db_table} AS cp1
+          INNER JOIN (SELECT currency_id, MAX(date_updated) AS date_updated FROM {Pair._meta.db_table} WHERE currency_id = {self.id} GROUP BY currency_id) AS cp2
+        WHERE cp1.currency_id = {self.id} AND cp1.currency_id=cp2.currency_id AND cp1.date_updated=cp2.date_updated
+        '''
+
+        with connections['default'].cursor() as cursor:
+            # TODO exceptions
+            cursor.execute(raw_sql)
+            columns = [col[0] for col in cursor.description]
+            data = cursor.fetchall()
+
+            pairs = [Pair(**dict(zip(columns, row))) for row in data]
+            return pairs
     def __str__(self):
         return f'<{self.__class__.__name__}>: {self.name} ({self.id})'
 

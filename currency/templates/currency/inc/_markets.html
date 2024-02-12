@@ -18,8 +18,8 @@
                 </tr>
             </thead>
             <tbody>
-                {% for pair in currency.pair.all %}
-                    <tr>
+                {% for pair in currency.get_latest_pair %}
+                    <tr {% if not pair.is_verified %}class="unverified"{% endif %}>
                         <th class="left">{{ forloop.counter }}</th>
                         <th class="left">{{ pair.exchange_name }}</th>
                         <th>{% if pair.dexer_url %}<a href="{{ pair.dexer_url }}" target="_blank">{% endif %} {{ pair.market_pair }}{% if pair.dexer_url %}</a>{% endif %}</th>

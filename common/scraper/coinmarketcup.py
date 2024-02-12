@@ -165,26 +165,67 @@ class CMCScraper:
                 response.raise_for_status()
                 data = json.loads(response.text)
 
+                date_updated = int(datetime.now().timestamp())
                 market_pairs_data = data.get('data', {}).get('marketPairs', {})
-                pairs_data = [{camel_to_snake(k): v for k, v in pair.items() if not k == 'quotes'}
-                              for pair in market_pairs_data
-                              if pair.get('isVerified')]
+                pairs_data = [{
+                    'market_id': pair['marketId'],
+
+                    'base_currency_id': pair['baseCurrencyId'],
+                    'base_symbol': pair['baseSymbol'],
+                    'category': pair['category'],
+                    'center_type': pair['centerType'],
+                    'depth_usd_negative_two': pair.get('depthUsdNegativeTwo'),
+                    'depth_usd_positive_two': pair.get('depthUsdPositiveTwo'),
+                    'effective_liquidity': pair.get('effectiveLiquidity'),
+                    'exchange_id': pair['exchangeId'],
+                    'exchange_name': pair['exchangeName'],
+                    'exchange_notice': pair.get('exchangeNotice'),
+                    'exchange_slug': pair['exchangeSlug'],
+                    'fee_type': pair.get('feeType'),
+                    'index_price': pair['indexPrice'],
+                    'is_verified': pair['isVerified'],
+                    'last_updated': int(datetime.strptime(pair['lastUpdated'], '%Y-%m-%dT%H:%M:%S.%fZ').timestamp()),
+                    'market_pair': pair['marketPair'],
+                    'market_reputation': pair['marketReputation'] * 100 if pair['marketReputation'] else 0,
+                    'market_score': pair['marketScore'],
+                    'market_url': pair['marketUrl'],
+                    'outlier_detected': pair.get('outlierDetected'),
+                    'por_audit_status': pair['porAuditStatus'],
+                    'price': pair['price'],
+                    'price_excluded': pair.get('priceExcluded'),
+                    'quote': pair['quote'],
+                    'quote_currency_id': pair['quoteCurrencyId'],
+                    'quote_symbol': pair['quoteSymbol'],
+                    'rank': pair['rank'],
+                    'reserves_available': pair['reservesAvailable'],
+                    'type': pair.get('type'),
+                    'volume_base': pair['volumeBase'],
+                    'volume_excluded': pair.get('volumeExcluded'),
+                    'volume_percent': pair['volumePercent'],
+                    'volume_quote': pair['volumeQuote'],
+                    'volume_usd': pair['volumeUsd'],
+
+                    # can be None
+                    'dexer_url': pair.get('dexerUrl'),
+                    'liquidity': pair.get('liquidity'),
+                    'pair_contract_address': pair.get('pairContractAddress'),
+                    'platform_id': pair.get('platformId'),
+                    'platform_name': pair.get('platformName'),
+
+                    'date_updated': date_updated,
+                } for pair in market_pairs_data]
+
 
                 for p_data in pairs_data:
-                    p_data.update({'date_updated': int(datetime.strptime(p_data['last_updated'], '%Y-%m-%dT%H:%M:%S.%fZ').timestamp())})
-                    del p_data['last_updated']
                     pairs.append(Pair(currency=currency, **p_data))
 
                 start += limit
                 params.update({'start': start})
+        except Exception as ex:
+            print(ex)
 
         finally:
-            Pair.objects.bulk_create(pairs, ignore_conflicts=True)
-
-            pair_fields = [f.name for f in Pair._meta.get_fields() if not f.name in ['market_id', 'currency']]
-            for chunk_pairs in chunk_list(pairs, 500): # data too long
-                Pair.objects.bulk_update(chunk_pairs, fields=pair_fields)
-
+            created = Pair.objects.bulk_create(pairs)
             return pairs
 
     def get_chart_data(self, currency: Currency, chart_range: ChartRange=ChartRange.all, is_save=True) -> list[ChartData]:
@@ -365,5 +406,5 @@ class CMCScraper:
         return currencies
 
 if __name__ == '__main__':
-    currencies = CMCScraper().get_listings_new()
+    curr = CMCScraper().get_listings_new()
 
