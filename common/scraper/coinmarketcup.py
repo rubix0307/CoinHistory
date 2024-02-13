@@ -228,7 +228,7 @@ class CMCScraper:
             created = Pair.objects.bulk_create(pairs)
             return pairs
 
-    def get_chart_data(self, currency: Currency, chart_range: ChartRange=ChartRange.all, is_save=True) -> list[ChartData]:
+    def get_chart_data(self, currency: Currency, chart_range: ChartRange=ChartRange.day, is_save=True) -> list[ChartData]:
         # TODO exceptions
         url = 'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail/chart'
         params = {
