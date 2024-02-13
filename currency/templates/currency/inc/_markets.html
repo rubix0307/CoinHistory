@@ -11,11 +11,9 @@
                     <th>Pair</th>
                     <th>Price</th>
                     <th>Volume (24h)</th>
-                    <th>Volume %</th>
                     <th>Confidence</th>
                     <th>Liquidity Score</th>
                     <th>Last updated</th>
-                    <th>Date added</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,17 +22,20 @@
                         <th class="left">{{ forloop.counter }}</th>
                         <th class="left">{{ pair.exchange_name }}</th>
                         <th>{% if pair.dexer_url %}<a href="{{ pair.dexer_url }}" target="_blank">{% endif %} {{ pair.market_pair }}{% if pair.dexer_url %}</a>{% endif %}</th>
-                        <th>{{ pair.price }}</th>
+                        <th>{{ pair.price|floatformat:3 }}</th>
                         <th>{{ pair.volume_usd|div:1000|floatformat:3 }}</th>
-                        <th>{{ pair.volume_percent|floatformat:2 }}</th>
-                        <th>{% if pair.market_reputation >= 76 %}<div class="high">High</div>
-                                {% else %}
-                                {% if pair.market_reputation >= 51 %}<div class="moderate">Moderate</div>{% else %}<div class="low">Low</div>{% endif %}
+                        <th>
+                            {% if pair.market_reputation %}
+                                {% if pair.market_reputation >= 76 %}<div class="confidence high">High</div>
+                                    {% else %}
+                                    {% if pair.market_reputation >= 51 %}<div class="confidence moderate">Moderate</div>{% else %}<div class="confidence low">Low</div>{% endif %}
+                                {% endif %}
+                            {% else %}
+                                <div class="confidence na">N/A</div>
                             {% endif %}
                         </th>
                         <th>{{ pair.effective_liquidity|floatformat:0 }}</th>
                         <th>{{ pair.date_updated }}</th>
-                        <th>{{ pair.date_added }}</th>
                     </tr>
                 {% endfor %}
             </tbody>

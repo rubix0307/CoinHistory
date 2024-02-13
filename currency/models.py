@@ -18,17 +18,14 @@ class Pair(models.Model):
     exchange_name = models.CharField(max_length=255)
     exchange_notice = models.TextField()
     exchange_slug = models.CharField(max_length=255)
-    fee_type = models.CharField(max_length=255)
     index_price = models.IntegerField()
     is_verified = models.BooleanField()
     market_pair = models.CharField(max_length=255)
     market_reputation = models.FloatField()  # for confidence
     market_score = models.CharField(max_length=255)
     market_url = models.CharField(max_length=255)
-    outlier_detected = models.IntegerField()
     por_audit_status = models.IntegerField()
     price = models.FloatField(null=True)
-    price_excluded = models.IntegerField()
     quote = models.FloatField(null=True)
     quote_currency_id = models.IntegerField()
     quote_symbol = models.CharField(max_length=255)
@@ -36,13 +33,16 @@ class Pair(models.Model):
     reserves_available = models.IntegerField()
     type = models.CharField(max_length=255)
     volume_base = models.FloatField(null=True)
-    volume_excluded = models.IntegerField()
+    volume_excluded = models.IntegerField(null=True)
     volume_percent = models.FloatField(null=True)
     volume_quote = models.FloatField(null=True)
     volume_usd = models.FloatField(null=True)
 
     dexer_url = models.URLField(null=True, max_length=1000)
+    fee_type = models.CharField(max_length=255, null=True)
+    outlier_detected = models.IntegerField(null=True)
     liquidity = models.FloatField(null=True)
+    price_excluded = models.IntegerField(null=True)
     pair_contract_address = models.CharField(null=True, max_length=255)
     platform_id = models.IntegerField(null=True)
     platform_name = models.CharField(null=True, max_length=255)
@@ -129,9 +129,10 @@ class Currency(models.Model):
 
     def get_latest_pair(self) -> list | list[Pair]:
         raw_sql = f'''
-        SELECT cp1.* FROM {Pair._meta.db_table} AS cp1
-          INNER JOIN (SELECT currency_id, MAX(date_updated) AS date_updated FROM {Pair._meta.db_table} WHERE currency_id = {self.id} GROUP BY currency_id) AS cp2
-        WHERE cp1.currency_id = {self.id} AND cp1.currency_id=cp2.currency_id AND cp1.date_updated=cp2.date_updated
+        SELECT DISTINCT cp1.* FROM currency_pair AS cp1
+            INNER JOIN (SELECT market_id, currency_id, MAX(date_updated) AS date_updated FROM currency_pair WHERE currency_id = {self.id} GROUP BY market_id, currency_id) AS cp2
+        WHERE cp1.date_updated=cp2.date_updated
+        ORDER BY cp1.market_reputation DESC, cp1.volume_usd DESC
         '''
 
         with connections['default'].cursor() as cursor:

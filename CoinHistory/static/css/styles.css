@@ -65,32 +65,38 @@ header {
 
     .the-table {
         width: 100%;
-        padding: 0;
+        padding: 0 15px;
         border-collapse: separate;
         border-spacing: 0 10px;
         overflow-x: scroll;
-    }
-    .the-table .high{
+
+        .confidence.high {
         background-color: #16C784;
-        border-radius: 10px;
-        padding: 3px;
-        color: white;
-    }
-    .the-table .moderate{
+        }
+        .confidence.moderate {
         background-color: #F5A341;
-        border-radius: 10px;
-        padding: 3px;
-        color: white;
-    }
-    .the-table .low{
+        }
+        .confidence.low{
         background-color: #EA3943;
+        }
+        .confidence.na {
+        background-color: #808080;
+        }
+        .unverified {
+        background-color: #e4e4e4;
+        }
+        .unverified .left{
+        background-color: #e4e4e4;
+        }
+    }
+    .the-table .confidence {
         border-radius: 10px;
         padding: 3px;
         color: white;
+
     }
-    .the-table .unverified {
-        background-color: gray;
-    }
+
+
     .the-table th.left {
         position: sticky;
         left: 0;
