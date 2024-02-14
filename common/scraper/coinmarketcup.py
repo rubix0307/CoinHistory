@@ -130,7 +130,7 @@ class CMCScraper:
             )
             currencies.append(currency)
 
-        Currency.objects.bulk_create(currencies)
+        Currency.objects.bulk_create(currencies, ignore_conflicts=True)
 
         if get_all_chart_data:
             for num, currency in enumerate(currencies):

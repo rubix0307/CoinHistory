@@ -25,41 +25,37 @@ def get_candles_chart_data(*, smallest_grading: int, currency_id: int) -> list[C
     :return: list[CandleData]
     """
 
-    db_table = Price._meta.db_table
     raw_sql = f"""
-        -- make time frame for all currency data
-        WITH RECURSIVE TimeSeries (time) AS (
-            SELECT (SELECT MIN(time) FROM {db_table} WHERE currency_id = {currency_id}) -- start
-            UNION ALL
-            SELECT time + {smallest_grading} -- step
-            FROM TimeSeries
-            WHERE time < (SELECT MAX(time) FROM {db_table} WHERE currency_id = {currency_id})  -- end
-        )
-        
-        -- make candlesticks data
         SELECT
-              FLOOR(time) AS time,
-              SUBSTRING_INDEX(MIN(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS open,
-              MAX(price) AS high,
-              MIN(price) AS low,
-              SUBSTRING_INDEX(MAX(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS close,
-              SUBSTRING_INDEX(MAX(CONCAT(LPAD(time, 10, '0'), '_', price)), '_', -1) AS value
-        FROM (SELECT *, FLOOR(time/{smallest_grading}) AS n FROM {db_table} WHERE currency_id = {currency_id}
+            MAX(time) as time,
+            MAX(price) AS high,
+            MIN(price) AS low,
+            SPLIT_PART(MIN(CONCAT(LPAD(CAST(time AS TEXT), 10, '0'), '_', price)), '_', 2) AS open,
+            SPLIT_PART(MAX(CONCAT(LPAD(CAST(time AS TEXT), 10, '0'), '_', price)), '_', 2) AS close
+        FROM (SELECT *, FLOOR(time/{smallest_grading}) AS n FROM currency_price WHERE currency_id = {currency_id}
               UNION
-              SELECT *, FLOOR(time/{smallest_grading})-1 AS n FROM {db_table} WHERE currency_id = {currency_id} AND !(time%{smallest_grading})
-              UNION
-              SELECT null as id, ts.time as time, null as price, {currency_id} as currency_id, FLOOR(time/{smallest_grading}) AS n FROM TimeSeries AS ts
+              SELECT *, FLOOR(time/{smallest_grading})-1 AS n FROM currency_price WHERE currency_id = {currency_id} AND (time%{smallest_grading}) = 0
              ) AS union_table
         GROUP BY n
+        ORDER BY time
     """
 
     with connections['default'].cursor() as cursor:
         # TODO exceptions
         cursor.execute(raw_sql)
-        columns = [col[0] for col in cursor.description]
-        data = cursor.fetchall()
+        # columns = [col[0] for col in cursor.description]
 
-        chart_data = [CandleData(**dict(zip(columns, [float(r) if type(r) == str else r for r in row]))) for row in
-                      (data[1:-1] if len(data) > 2 else data)]
+        all_data = cursor.fetchall()
 
-    return chart_data
+        time_line = {}
+        if len(all_data) > 1:
+            for t in range(all_data[1][0], all_data[-1][0] + 1, smallest_grading):
+                time_line.update({t:CandleData(**{'time': t, 'high': None, 'low': None, 'open': None, 'close': None, 'value': None})})
+
+        for d in all_data:
+            time_line.update({d[0]:CandleData(**{'time': d[0], 'high': float(d[1]), 'low': float(d[2]), 'open': float(d[3]), 'close': float(d[4]), 'value': float(d[4])})})
+
+
+        candle_data = [i for i in time_line.values()]
+
+    return candle_data

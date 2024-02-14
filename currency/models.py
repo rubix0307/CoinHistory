@@ -127,12 +127,25 @@ class Currency(models.Model):
     date_updated = models.BigIntegerField(default=int(timezone.now().timestamp()))
     date_added = models.BigIntegerField(default=int(timezone.now().timestamp()))
 
-    def get_latest_pair(self) -> list | list[Pair]:
+    def get_latest_pair(self, limit=100) -> list | list[Pair]:
         raw_sql = f'''
-        SELECT DISTINCT cp1.* FROM currency_pair AS cp1
-            INNER JOIN (SELECT market_id, currency_id, MAX(date_updated) AS date_updated FROM currency_pair WHERE currency_id = {self.id} GROUP BY market_id, currency_id) AS cp2
-        WHERE cp1.date_updated=cp2.date_updated
-        ORDER BY cp1.market_reputation DESC, cp1.volume_usd DESC
+            SELECT cp.*
+            FROM currency_pair cp
+            INNER JOIN (
+              SELECT
+                market_id,
+                currency_id,
+                MAX(date_updated) as last_updated
+              FROM currency_pair
+              GROUP BY market_id, currency_id
+            ) AS latest
+            ON cp.market_id = latest.market_id
+            AND cp.currency_id = latest.currency_id
+            AND cp.date_updated = latest.last_updated
+            
+            WHERE cp.currency_id = {self.id}
+            ORDER BY cp.market_reputation DESC, cp.volume_usd DESC
+            LIMIT {limit}
         '''
 
         with connections['default'].cursor() as cursor:
