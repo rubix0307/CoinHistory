@@ -27,12 +27,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-e71qg++d(bl$c1(9!2pf6)5xz2-qtzd^imdi+tqxnq^qlr54g7'
+SECRET_KEY = 'django-insecure-e71qg++d(bl$c1(9!2pf6)5xz2-qtzsadd^imdi+tqxnq^qlr54g7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.path.exists('.debug')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*','webtarget.online', 'www.webtarget.online']
 
 
 # Application definition
@@ -143,3 +143,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'profile'
 LOGIN_URL = reverse_lazy('login')
+
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ['https://webtarget.online']

@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from user import views as user_views
 
 urlpatterns = [
@@ -29,4 +31,5 @@ urlpatterns = [
     path('', include('main.urls')),
 
     path('currencies/', include('currency.urls')),
-]
+
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
