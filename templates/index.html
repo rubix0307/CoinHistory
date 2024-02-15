@@ -1,13 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
-    <div class="feed">
-        <h1>Welcome</h1>
-        {% if request.user.is_authenticated %}
-        	<div>You can see the <a href="{% url 'currency_index' %}">currencies</a></div>
-        {% else %}
-            <div>You have to <a href="{% url 'login' %}">log in</a></div>
-        {% endif %}
+    <div class="feed" style="width: 100%; margin: 0 auto;">
+        <img src="{% static 'img/coming_soon.png' %}" alt="" style="width: 100%; margin: 0 auto;">
     </div>
 {% endblock %}
